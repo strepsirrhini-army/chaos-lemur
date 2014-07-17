@@ -8,9 +8,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
+/**
+ * Main entry point and configuration class
+ */
 @ComponentScan
 @EnableAutoConfiguration
 public class ApplicationConfiguration {
+
     /**
      * Start method
      *
@@ -20,4 +24,5 @@ public class ApplicationConfiguration {
     public static void main(String[] args) throws Exception {
         SpringApplication.run(ApplicationConfiguration.class, args);
     }
+
 }
