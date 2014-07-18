@@ -6,7 +6,11 @@ package com.gopivotal.chaoslemur;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+
+import java.security.SecureRandom;
+import java.util.Random;
 
 /**
  * Main entry point and configuration class
@@ -25,4 +29,8 @@ public class ApplicationConfiguration {
         SpringApplication.run(ApplicationConfiguration.class, args);
     }
 
+    @Bean
+    Random random() {
+        return new SecureRandom();
+    }
 }
