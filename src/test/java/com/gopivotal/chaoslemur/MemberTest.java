@@ -6,6 +6,7 @@ package com.gopivotal.chaoslemur;
 
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertNotNull;
 
 public final class MemberTest {
@@ -17,4 +18,13 @@ public final class MemberTest {
         assertNotNull(this.member);
     }
 
+    @Test
+    public void getGroup() {
+        assertTrue(this.member.getGroup().equals("group"));
+    }
+
+    @Test
+    public void toStringTest() {
+        assertTrue(this.member.toString().equals("[group: group]"));
+    }
 }

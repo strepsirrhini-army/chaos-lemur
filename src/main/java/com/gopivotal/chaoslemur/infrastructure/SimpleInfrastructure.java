@@ -4,7 +4,9 @@
 
 package com.gopivotal.chaoslemur.infrastructure;
 
+import com.gopivotal.chaoslemur.DestructionException;
 import com.gopivotal.chaoslemur.Member;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +14,7 @@ import java.util.Set;
 /**
  * A simple implementation of {@link Infrastructure}. Returns static values for all methods.
  */
+@Component
 public final class SimpleInfrastructure implements Infrastructure {
 
     @Override
@@ -23,5 +26,10 @@ public final class SimpleInfrastructure implements Infrastructure {
         members.add(new Member("group-3"));
 
         return members;
+    }
+
+    @Override
+    public void destroy(Member member) throws DestructionException {
+        //
     }
 }

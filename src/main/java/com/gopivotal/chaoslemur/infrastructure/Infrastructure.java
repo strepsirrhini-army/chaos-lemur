@@ -5,6 +5,7 @@
 package com.gopivotal.chaoslemur.infrastructure;
 
 
+import com.gopivotal.chaoslemur.DestructionException;
 import com.gopivotal.chaoslemur.Member;
 
 import java.util.Set;
@@ -21,4 +22,11 @@ public interface Infrastructure {
      */
     Set<Member> getMembers();
 
+    /**
+     * Destroys a {@link Member}
+     *
+     * @param member The member to destroy
+     * @throws DestructionException
+     */
+    void destroy(Member member) throws DestructionException;
 }
