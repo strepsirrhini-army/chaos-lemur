@@ -16,11 +16,14 @@ import static org.mockito.Mockito.when;
 
 public final class RandomFateEngineTest {
 
+    private final String[] blacklist = new String[]{"test-1", "test-2"};
+
     private final MockEnvironment environment = new MockEnvironment();
 
     private final Random random = mock(Random.class);
 
-    private final RandomFateEngine fateEngine = new RandomFateEngine(0.3f, this.environment, this.random);
+    private final RandomFateEngine fateEngine = new RandomFateEngine(this.blacklist, 0.3f, this.environment,
+            this.random);
 
     @Test
     public void killDefault() {
@@ -47,6 +50,15 @@ public final class RandomFateEngineTest {
 
         when(this.random.nextFloat()).thenReturn(0.4f);
         assertTrue(fateEngine.shouldDie(member));
+
+    }
+
+    @Test
+    public void blacklist() {
+        Member member = new Member("test-1");
+
+        when(this.random.nextFloat()).thenReturn(0.0f);
+        assertFalse(fateEngine.shouldDie(member));
 
     }
 
