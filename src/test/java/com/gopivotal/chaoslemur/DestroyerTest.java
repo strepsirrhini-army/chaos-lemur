@@ -19,16 +19,18 @@ public final class DestroyerTest {
 
     private final Infrastructure infrastructure = mock(Infrastructure.class);
 
-    private final Destroyer destroyer = new Destroyer(this.fateEngine, this.infrastructure, "0/11 * * * * *");
+    private final DataDog dataDog = mock(DataDog.class);
 
-    private final Member member1 = new Member("test");
+    private final Destroyer destroyer = new Destroyer(dataDog, this.infrastructure, "0/11 * * * * *", this.fateEngine);
 
-    private final Member member2 = new Member("test");
+    private final Member member1 = new Member("test-group", "test-name-1");
+
+    private final Member member2 = new Member("test-group", "test-name-2");
 
     private final Set<Member> members = new HashSet<>();
 
     @Before
-    public void members() {
+         public void members() {
         this.members.add(this.member1);
         this.members.add(this.member2);
         when(this.infrastructure.getMembers()).thenReturn(this.members);

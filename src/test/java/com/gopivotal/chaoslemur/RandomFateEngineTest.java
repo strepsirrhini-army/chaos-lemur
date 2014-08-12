@@ -16,7 +16,7 @@ import static org.mockito.Mockito.when;
 
 public final class RandomFateEngineTest {
 
-    private final String[] blacklist = new String[]{"test-1", "test-2"};
+    private final String[] blacklist = new String[]{"test-group-1", "test-group-2"};
 
     private final MockEnvironment environment = new MockEnvironment();
 
@@ -27,7 +27,7 @@ public final class RandomFateEngineTest {
 
     @Test
     public void killDefault() {
-        Member member = new Member("test");
+        Member member = new Member("test-group", "test-name");
 
         when(this.random.nextFloat()).thenReturn(0.2f);
         assertTrue(fateEngine.shouldDie(member));
@@ -36,7 +36,7 @@ public final class RandomFateEngineTest {
 
     @Test
     public void saveDefault() {
-        Member member = new Member("test");
+        Member member = new Member("test-group", "test-name");
 
         when(this.random.nextFloat()).thenReturn(0.5f);
         assertFalse(fateEngine.shouldDie(member));
@@ -45,8 +45,8 @@ public final class RandomFateEngineTest {
 
     @Test
     public void killNonDefault() {
-        this.environment.setProperty("test.probability", "0.7");
-        Member member = new Member("test");
+        this.environment.setProperty("test-group.probability", "0.7");
+        Member member = new Member("test-group", "test-name");
 
         when(this.random.nextFloat()).thenReturn(0.4f);
         assertTrue(fateEngine.shouldDie(member));
@@ -55,7 +55,7 @@ public final class RandomFateEngineTest {
 
     @Test
     public void blacklist() {
-        Member member = new Member("test-1");
+        Member member = new Member("test-group-1", "test-name-1");
 
         when(this.random.nextFloat()).thenReturn(0.0f);
         assertFalse(fateEngine.shouldDie(member));
