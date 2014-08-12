@@ -21,9 +21,9 @@ public final class SimpleInfrastructure implements Infrastructure {
     public Set<Member> getMembers() {
         Set<Member> members = new HashSet<>();
 
-        members.add(new Member("group-1"));
-        members.add(new Member("group-2"));
-        members.add(new Member("group-3"));
+        members.add(new Member("group-1", "name-1"));
+        members.add(new Member("group-2", "name-2"));
+        members.add(new Member("group-3", "name-3"));
 
         return members;
     }

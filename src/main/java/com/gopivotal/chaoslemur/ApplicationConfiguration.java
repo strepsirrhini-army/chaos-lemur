@@ -8,6 +8,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.client.RestTemplate;
 
 import java.security.SecureRandom;
 import java.util.Random;
@@ -17,6 +19,7 @@ import java.util.Random;
  */
 @ComponentScan
 @EnableAutoConfiguration
+@EnableScheduling
 public class ApplicationConfiguration {
 
     /**
@@ -32,5 +35,10 @@ public class ApplicationConfiguration {
     @Bean
     Random random() {
         return new SecureRandom();
+    }
+
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }
