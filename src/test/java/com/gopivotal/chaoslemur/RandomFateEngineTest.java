@@ -27,7 +27,7 @@ public final class RandomFateEngineTest {
 
     @Test
     public void killDefault() {
-        Member member = new Member("test-group", "test-name");
+        Member member = new Member("test-id", "test-name", "test-group");
 
         when(this.random.nextFloat()).thenReturn(0.2f);
         assertTrue(fateEngine.shouldDie(member));
@@ -36,7 +36,7 @@ public final class RandomFateEngineTest {
 
     @Test
     public void saveDefault() {
-        Member member = new Member("test-group", "test-name");
+        Member member = new Member("test-id", "test-name", "test-group");
 
         when(this.random.nextFloat()).thenReturn(0.5f);
         assertFalse(fateEngine.shouldDie(member));
@@ -46,7 +46,7 @@ public final class RandomFateEngineTest {
     @Test
     public void killNonDefault() {
         this.environment.setProperty("test-group.probability", "0.7");
-        Member member = new Member("test-group", "test-name");
+        Member member = new Member("test-id", "test-name", "test-group");
 
         when(this.random.nextFloat()).thenReturn(0.4f);
         assertTrue(fateEngine.shouldDie(member));
@@ -55,7 +55,7 @@ public final class RandomFateEngineTest {
 
     @Test
     public void blacklist() {
-        Member member = new Member("test-group-1", "test-name-1");
+        Member member = new Member("test-id-1", "test-name-1", "test-group-1");
 
         when(this.random.nextFloat()).thenReturn(0.0f);
         assertFalse(fateEngine.shouldDie(member));

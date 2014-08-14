@@ -12,7 +12,7 @@ import static org.junit.Assert.assertFalse;
 
 public final class SimpleInfrastructureTest {
 
-    private final Member member = new Member("test-group", "test-name");
+    private final Member member = new Member("test-id", "test-name", "test-group");
 
     private final SimpleInfrastructure infrastructure = new SimpleInfrastructure();
 

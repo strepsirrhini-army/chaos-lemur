@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull;
 
 public final class MemberTest {
 
-    private final Member member = new Member("test-group", "test-name");
+    private final Member member = new Member("test-id", "test-name", "test-group");
 
     @Test
     public void test() {
@@ -19,8 +19,8 @@ public final class MemberTest {
     }
 
     @Test
-    public void getGroup() {
-        assertTrue(this.member.getGroup().equals("test-group"));
+    public void getId() {
+        assertTrue(this.member.getId().equals("test-id"));
     }
 
     @Test
@@ -29,7 +29,12 @@ public final class MemberTest {
     }
 
     @Test
+    public void getGroup() {
+        assertTrue(this.member.getGroup().equals("test-group"));
+    }
+
+    @Test
     public void toStringTest() {
-        assertTrue(this.member.toString().equals("[group: test-group, name: test-name]"));
+        assertTrue(this.member.toString().equals("[id: test-id, name: test-name, group: test-group]"));
     }
 }
