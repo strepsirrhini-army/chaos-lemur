@@ -23,9 +23,9 @@ public final class DestroyerTest {
 
     private final Destroyer destroyer = new Destroyer(dataDog, this.infrastructure, "0/11 * * * * *", this.fateEngine);
 
-    private final Member member1 = new Member("test-group", "test-name-1");
+    private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
 
-    private final Member member2 = new Member("test-group", "test-name-2");
+    private final Member member2 = new Member("test-id-2", "test-name-2", "test-group");
 
     private final Set<Member> members = new HashSet<>();
 

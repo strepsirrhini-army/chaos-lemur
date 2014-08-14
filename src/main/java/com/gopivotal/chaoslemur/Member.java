@@ -9,9 +9,11 @@ package com.gopivotal.chaoslemur;
  */
 public final class Member {
 
-    private final String group;
+    private final String id;
 
     private final String name;
+
+    private final String group;
 
 
     /**
@@ -19,19 +21,19 @@ public final class Member {
      *
      * @param group the group the {@link Member} belongs to
      */
-    public Member(String group, String name) {
-        this.group = group;
+    public Member(String id, String name, String group) {
+        this.id = id;
         this.name = name;
+        this.group = group;
     }
 
-
     /**
-     * Returns the group the {@link Member} belongs to
+     * Returns the ID of the {@link Member}
      *
-     * @return the group the {@link Member} belongs to
+     * @return the ID of the {@link Member}
      */
-    public String getGroup() {
-        return this.group;
+    public String getId() {
+        return this.id;
     }
 
     /**
@@ -43,9 +45,18 @@ public final class Member {
         return this.name;
     }
 
+    /**
+     * Returns the group the {@link Member} belongs to
+     *
+     * @return the group the {@link Member} belongs to
+     */
+    public String getGroup() {
+        return this.group;
+    }
+
     @Override
     public String toString() {
-        return String.format("[group: %s, name: %s]", this.group, this.name);
+        return String.format("[id: %s, name: %s, group: %s]", this.id, this.name, this.group);
     }
 
 

@@ -11,13 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public class StandardDataDogTest {
 
@@ -35,7 +32,7 @@ public class StandardDataDogTest {
     }
 
     @Test
-    public void testSendEvent() throws Exception {
+    public void sendEvent() {
         mockServer.expect(requestTo(URI))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("resultSuccess", MediaType.TEXT_PLAIN));
@@ -46,7 +43,7 @@ public class StandardDataDogTest {
     }
 
     @Test
-    public void testBadSendEvent() throws Exception {
+    public void badSendEvent() {
         mockServer.expect(requestTo(URI))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest());
