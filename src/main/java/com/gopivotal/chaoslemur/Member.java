@@ -15,7 +15,6 @@ public final class Member {
 
     private final String group;
 
-
     /**
      * Creates an instance
      *
@@ -58,6 +57,5 @@ public final class Member {
     public String toString() {
         return String.format("[id: %s, name: %s, group: %s]", this.id, this.name, this.group);
     }
-
 
 }

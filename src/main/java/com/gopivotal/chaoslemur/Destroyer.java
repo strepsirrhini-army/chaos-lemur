@@ -4,6 +4,8 @@
 
 package com.gopivotal.chaoslemur;
 
+import com.gopivotal.chaoslemur.datadog.DataDog;
+import com.gopivotal.chaoslemur.infrastructure.DestructionException;
 import com.gopivotal.chaoslemur.infrastructure.Infrastructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,11 +19,8 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-/**
- * Destroys members on a regular schedule.
- */
 @Component
-public final class Destroyer {
+final class Destroyer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 

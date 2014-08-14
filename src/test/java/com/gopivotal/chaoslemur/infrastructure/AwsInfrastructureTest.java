@@ -5,7 +5,13 @@
 package com.gopivotal.chaoslemur.infrastructure;
 
 import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.model.*;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Filter;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Reservation;
+import com.amazonaws.services.ec2.model.Tag;
+import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.gopivotal.chaoslemur.Member;
 import org.junit.Test;
 
@@ -14,10 +20,10 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-public class AwsInfrastructureTest {
+public final class AwsInfrastructureTest {
 
     private final Member member = new Member("test-id", "test-name", "test-group");
 

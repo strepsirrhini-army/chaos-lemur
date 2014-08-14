@@ -5,15 +5,19 @@
 package com.gopivotal.chaoslemur.infrastructure;
 
 import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.model.*;
-import com.gopivotal.chaoslemur.DestructionException;
+import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
+import com.amazonaws.services.ec2.model.DescribeInstancesResult;
+import com.amazonaws.services.ec2.model.Filter;
+import com.amazonaws.services.ec2.model.Instance;
+import com.amazonaws.services.ec2.model.Tag;
+import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import com.gopivotal.chaoslemur.Member;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-/**
- * An AWS implementation of {@link com.gopivotal.chaoslemur.infrastructure.Infrastructure}.
- */
 final class AwsInfrastructure implements Infrastructure {
 
     private final AmazonEC2 amazonEC2;
@@ -24,7 +28,6 @@ final class AwsInfrastructure implements Infrastructure {
         this.amazonEC2 = amazonEC2;
         this.vpcId = vpcId;
     }
-
 
     @Override
     public Set<Member> getMembers() {
