@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package com.gopivotal.chaoslemur;
+package com.gopivotal.chaoslemur.datadog;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,13 +16,11 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-public class StandardDataDogTest {
-
-    private DataDog dataDog;
-
-    private MockRestServiceServer mockServer;
+public final class StandardDataDogTest {
 
     private static final String URI = "https://app.datadoghq.com/api/v1/events?api_key=apiKey&application_key=appKey";
+    private DataDog dataDog;
+    private MockRestServiceServer mockServer;
 
     @Before
     public void setup() {

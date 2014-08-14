@@ -4,7 +4,6 @@
 
 package com.gopivotal.chaoslemur.infrastructure;
 
-import com.gopivotal.chaoslemur.DestructionException;
 import com.gopivotal.chaoslemur.Member;
 import org.junit.Test;
 

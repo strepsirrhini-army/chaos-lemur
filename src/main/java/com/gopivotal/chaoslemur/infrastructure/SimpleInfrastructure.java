@@ -4,17 +4,11 @@
 
 package com.gopivotal.chaoslemur.infrastructure;
 
-import com.gopivotal.chaoslemur.DestructionException;
 import com.gopivotal.chaoslemur.Member;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * A simple implementation of {@link Infrastructure}. Returns static values for all methods.
- */
 final class SimpleInfrastructure implements Infrastructure {
 
     @Override
@@ -30,6 +24,6 @@ final class SimpleInfrastructure implements Infrastructure {
 
     @Override
     public void destroy(Member member) throws DestructionException {
-        //
     }
+
 }

@@ -4,6 +4,8 @@
 
 package com.gopivotal.chaoslemur;
 
+import com.gopivotal.chaoslemur.datadog.DataDog;
+import com.gopivotal.chaoslemur.infrastructure.DestructionException;
 import com.gopivotal.chaoslemur.infrastructure.Infrastructure;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +13,11 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public final class DestroyerTest {
 
@@ -30,7 +36,7 @@ public final class DestroyerTest {
     private final Set<Member> members = new HashSet<>();
 
     @Before
-         public void members() {
+    public void members() {
         this.members.add(this.member1);
         this.members.add(this.member2);
         when(this.infrastructure.getMembers()).thenReturn(this.members);

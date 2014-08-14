@@ -13,4 +13,5 @@ interface FateEngine {
      * @return Whether a member should live or die
      */
     Boolean shouldDie(Member member);
+
 }
