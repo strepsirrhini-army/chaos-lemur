@@ -7,7 +7,7 @@ package com.gopivotal.chaoslemur;
 /**
  * Represents a running instance
  */
-public final class Member {
+public final class Member implements Comparable<Member>{
 
     private final String id;
 
@@ -54,8 +54,12 @@ public final class Member {
     }
 
     @Override
+    public int compareTo(Member member) {
+        return this.name.compareTo(member.getName());
+    }
+
+    @Override
     public String toString() {
         return String.format("[id: %s, name: %s, group: %s]", this.id, this.name, this.group);
     }
-
 }
