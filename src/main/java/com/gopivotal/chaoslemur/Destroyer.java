@@ -63,11 +63,13 @@ final class Destroyer {
                 }
             }
         });
+
         this.dataDog.sendEvent(title(identifier), message(destroyedMembers));
     }
 
     private String message(List<Member> members) {
-        return members.stream().map((member) -> "\u2022 " + member.getName()).collect(Collectors.joining("\n"));
+        return members.stream().sorted().map((member) -> "\u2022 " + member.getName()).collect(Collectors.joining
+                ("\n"));
     }
 
     private String title(UUID identifier) {
