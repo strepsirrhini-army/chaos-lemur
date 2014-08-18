@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +23,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
 @Component
+@RestController
 final class Destroyer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -44,6 +48,7 @@ final class Destroyer {
      * Trigger method for destruction of members. This method is invoked on a schedule defined by the cron statement
      * stored in the {@code schedule} configuration property.  By default this schedule is {@code 0 0/10 * * * *}.
      */
+    @RequestMapping(method = RequestMethod.POST, value = "/destroy")
     @Scheduled(cron = "${schedule:0 0/10 * * * *}")
     public void destroy() {
         UUID identifier = UUID.randomUUID();
