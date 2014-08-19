@@ -73,7 +73,8 @@ final class Destroyer {
     }
 
     private String message(List<Member> members) {
-        return members.stream().sorted().map((member) -> "\u2022 " + member.getName()).collect(Collectors.joining
+        return members.size() + " VM(s) destroyed:\n"
+                + members.stream().sorted().map((member) -> "\u2022 " + member.getName()).collect(Collectors.joining
                 ("\n"));
     }
 
