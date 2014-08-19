@@ -17,12 +17,13 @@
         <version>1.1.5.RELEASE</version>
     </parent>
 
-    <groupId>com.gopivotal.chaos-lemur</groupId>
+    <groupId>io.pivotal.chaos-lemur</groupId>
     <artifactId>chaos-lemur</artifactId>
     <version>1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
+        <evo-inflector.version>1.2</evo-inflector.version>
         <java.version>1.8</java.version>
     </properties>
 
@@ -31,6 +32,11 @@
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
             <version>1.8.8</version>
+        </dependency>
+        <dependency>
+            <groupId>org.atteo</groupId>
+            <artifactId>evo-inflector</artifactId>
+            <version>${evo-inflector.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
