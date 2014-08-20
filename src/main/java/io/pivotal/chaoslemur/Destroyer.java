@@ -76,9 +76,13 @@ final class Destroyer {
     private String message(List<Member> members) {
         int size = members.size();
 
+        String SPACE = "\u00A0";
+        String BULLET = "\u2022";
+
         String s = "\n";
         s += size + English.plural(" VM", size) + " destroyed:\n";
-        s += members.stream().sorted().map((member) -> " \u2022 " + member.getName()).collect(Collectors.joining("\n"));
+        s += members.stream().sorted().map((member) -> SPACE + SPACE + BULLET + SPACE + member.getName()).collect
+                (Collectors.joining("\n"));
 
         return s;
     }
