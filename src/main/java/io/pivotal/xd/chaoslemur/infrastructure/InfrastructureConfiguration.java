@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.chaoslemur.infrastructure;
+package io.pivotal.xd.chaoslemur.infrastructure;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;

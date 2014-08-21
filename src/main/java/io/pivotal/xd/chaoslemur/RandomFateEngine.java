@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.chaoslemur;
+package io.pivotal.xd.chaoslemur;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

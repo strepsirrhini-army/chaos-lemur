@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.chaoslemur;
+package io.pivotal.xd.chaoslemur;
 
 interface FateEngine {
 

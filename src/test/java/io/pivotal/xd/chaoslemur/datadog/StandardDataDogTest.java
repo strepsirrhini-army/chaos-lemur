@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.chaoslemur.datadog;
+package io.pivotal.xd.chaoslemur.datadog;
 
 import org.junit.Before;
 import org.junit.Test;

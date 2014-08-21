@@ -2,11 +2,11 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.chaoslemur;
+package io.pivotal.xd.chaoslemur;
 
-import io.pivotal.chaoslemur.datadog.DataDog;
-import io.pivotal.chaoslemur.infrastructure.DestructionException;
-import io.pivotal.chaoslemur.infrastructure.Infrastructure;
+import io.pivotal.xd.chaoslemur.datadog.DataDog;
+import io.pivotal.xd.chaoslemur.infrastructure.DestructionException;
+import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import org.junit.Before;
 import org.junit.Test;
 

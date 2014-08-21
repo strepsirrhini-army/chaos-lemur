@@ -2,9 +2,9 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.chaoslemur.infrastructure;
+package io.pivotal.xd.chaoslemur.infrastructure;
 
-import io.pivotal.chaoslemur.Member;
+import io.pivotal.xd.chaoslemur.Member;
 
 import java.util.HashSet;
 import java.util.Set;

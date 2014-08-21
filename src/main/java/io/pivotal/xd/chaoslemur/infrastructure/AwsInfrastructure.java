@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.chaoslemur.infrastructure;
+package io.pivotal.xd.chaoslemur.infrastructure;
 
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
@@ -11,7 +11,7 @@ import com.amazonaws.services.ec2.model.Filter;
 import com.amazonaws.services.ec2.model.Instance;
 import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
-import io.pivotal.chaoslemur.Member;
+import io.pivotal.xd.chaoslemur.Member;
 
 import java.util.ArrayList;
 import java.util.HashSet;
