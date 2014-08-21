@@ -7,11 +7,17 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%d %-5level %msg%n</pattern>
+            <pattern>[CHAOS LEMUR] %-5level %msg%n</pattern>
         </encoder>
     </appender>
 
-    <logger name="io.pivotal.chaoslemur" level="${LOGGING_LEVEL:-INFO}"/>
+    <logger name="io.pivotal.xd.chaoslemur" level="${LOGGING_LEVEL:-INFO}"/>
+    <logger name="org.apache" level="ERROR"/>
+    <logger name="org.cloudfoundry.reconfiguration" level="INFO"/>
+    <logger name="org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping" level="INFO"/>
+    <logger name="org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration" level="INFO"/>
+    <logger name="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" level="INFO"/>
+    <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>

@@ -1,1 +1,4 @@
 ---
+spring:
+  main:
+    show_banner: false
