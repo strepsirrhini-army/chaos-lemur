@@ -36,7 +36,7 @@ final class Destroyer {
     private final Infrastructure infrastructure;
 
     @Autowired
-    Destroyer(DataDog dataDog, Infrastructure infrastructure, @Value("${schedule:0 0/10 * * * *}") String
+    Destroyer(DataDog dataDog, Infrastructure infrastructure, @Value("${schedule:0 0 * * * *}") String
             schedule, FateEngine fateEngine) {
         this.dataDog = dataDog;
         this.fateEngine = fateEngine;
@@ -50,7 +50,7 @@ final class Destroyer {
      * stored in the {@code schedule} configuration property.  By default this schedule is {@code 0 0/10 * * * *}.
      */
     @RequestMapping(method = RequestMethod.POST, value = "/destroy")
-    @Scheduled(cron = "${schedule:0 0/10 * * * *}")
+    @Scheduled(cron = "${schedule:0 0 * * * *}")
     public void destroy() {
         UUID identifier = UUID.randomUUID();
         this.logger.info("{} Beginning run...", identifier);

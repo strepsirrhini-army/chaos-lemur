@@ -29,7 +29,7 @@ final class RandomFateEngine implements FateEngine {
     private final Random random;
 
     @Autowired
-    RandomFateEngine(@Value("${blacklist:}") String[] blacklist, @Value("${default.probability:0.5}") Float
+    RandomFateEngine(@Value("${blacklist:}") String[] blacklist, @Value("${default.probability:0.2}") Float
             defaultProbability, Environment environment, Random random) {
         this.blacklist = blacklist;
         this.defaultProbability = defaultProbability.toString();
