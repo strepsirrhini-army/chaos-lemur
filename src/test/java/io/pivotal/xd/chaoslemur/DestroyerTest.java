@@ -4,7 +4,7 @@
 
 package io.pivotal.xd.chaoslemur;
 
-import io.pivotal.xd.chaoslemur.datadog.DataDog;
+import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import io.pivotal.xd.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import org.junit.Before;
@@ -25,9 +25,9 @@ public final class DestroyerTest {
 
     private final Infrastructure infrastructure = mock(Infrastructure.class);
 
-    private final DataDog dataDog = mock(DataDog.class);
+    private final Reporter reporter = mock(Reporter.class);
 
-    private final Destroyer destroyer = new Destroyer(dataDog, this.infrastructure, "0/11 * * * * *", this.fateEngine);
+    private final Destroyer destroyer = new Destroyer(reporter, this.infrastructure, "0/11 * * * * *", this.fateEngine);
 
     private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
 

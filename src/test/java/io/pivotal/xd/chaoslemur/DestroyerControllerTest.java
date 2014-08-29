@@ -4,7 +4,7 @@
 
 package io.pivotal.xd.chaoslemur;
 
-import io.pivotal.xd.chaoslemur.datadog.DataDog;
+import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import org.junit.Test;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,13 +21,13 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public final class DestroyerControllerTest {
 
-    private final DataDog dataDog = mock(DataDog.class);
+    private final Reporter reporter = mock(Reporter.class);
 
     private final Infrastructure infrastructure = mock(Infrastructure.class);
 
     private final FateEngine fateEngine = mock(FateEngine.class);
 
-    private final MockMvc mockMvc = standaloneSetup(new Destroyer(this.dataDog, this.infrastructure, "",
+    private final MockMvc mockMvc = standaloneSetup(new Destroyer(this.reporter, this.infrastructure, "",
             this.fateEngine)).build();
 
     @Test
