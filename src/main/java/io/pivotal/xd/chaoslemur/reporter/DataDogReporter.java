@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.xd.chaoslemur.datadog;
+package io.pivotal.xd.chaoslemur.reporter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
-final class StandardDataDog implements DataDog {
+final class DataDogReporter implements Reporter {
 
     private static final String URI = "https://app.datadoghq.com/" +
             "api/v1/events?api_key={apiKey}&application_key={appKey}";
@@ -24,7 +24,7 @@ final class StandardDataDog implements DataDog {
 
     private final RestTemplate restTemplate;
 
-    StandardDataDog(@Value("${dataDog.apiKey}") String apiKey, @Value("${dataDog.appKey}") String appKey,
+    DataDogReporter(@Value("${dataDog.apiKey}") String apiKey, @Value("${dataDog.appKey}") String appKey,
                     RestTemplate restTemplate) {
         this.apiKey = apiKey;
         this.appKey = appKey;

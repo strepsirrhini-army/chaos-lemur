@@ -2,7 +2,7 @@
  * Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
  */
 
-package io.pivotal.xd.chaoslemur.datadog;
+package io.pivotal.xd.chaoslemur.reporter;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,17 +16,17 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-public final class StandardDataDogTest {
+public final class DataDogReporterTest {
 
     private static final String URI = "https://app.datadoghq.com/api/v1/events?api_key=apiKey&application_key=appKey";
-    private DataDog dataDog;
+    private Reporter dataDog;
     private MockRestServiceServer mockServer;
 
     @Before
     public void setup() {
         RestTemplate restTemplate = new RestTemplate();
         this.mockServer = MockRestServiceServer.createServer(restTemplate);
-        this.dataDog = new StandardDataDog("apiKey", "appKey", restTemplate);
+        this.dataDog = new DataDogReporter("apiKey", "appKey", restTemplate);
     }
 
     @Test

@@ -4,7 +4,7 @@
 
 package io.pivotal.xd.chaoslemur;
 
-import io.pivotal.xd.chaoslemur.datadog.DataDog;
+import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import io.pivotal.xd.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import org.atteo.evo.inflector.English;
@@ -29,16 +29,16 @@ final class Destroyer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final DataDog dataDog;
+    private final Reporter reporter;
 
     private final FateEngine fateEngine;
 
     private final Infrastructure infrastructure;
 
     @Autowired
-    Destroyer(DataDog dataDog, Infrastructure infrastructure, @Value("${schedule:0 0 * * * *}") String
+    Destroyer(Reporter reporter, Infrastructure infrastructure, @Value("${schedule:0 0 * * * *}") String
             schedule, FateEngine fateEngine) {
-        this.dataDog = dataDog;
+        this.reporter = reporter;
         this.fateEngine = fateEngine;
         this.infrastructure = infrastructure;
 
@@ -70,7 +70,7 @@ final class Destroyer {
             }
         });
 
-        this.dataDog.sendEvent(title(identifier), message(destroyedMembers));
+        this.reporter.sendEvent(title(identifier), message(destroyedMembers));
     }
 
     private String message(List<Member> members) {
