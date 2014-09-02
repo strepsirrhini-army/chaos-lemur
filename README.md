@@ -47,6 +47,10 @@ cf logs chaos-lemur --recent
 ```
 
 
+## Manual Control
+Although Chaos Lemur runs on a definable schedule, it is possible to launch a destroy at any time using a `POST` to `http://<URL>/destroy`.
+
+
 ## Developing
 The project is set up as a Maven project and doesn't have any special requirements beyond that. It has been created using [IntelliJ][] and contains configuration information for that environment, but should work with other IDEs.
 
