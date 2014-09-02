@@ -47,7 +47,7 @@ final class Destroyer {
 
     /**
      * Trigger method for destruction of members. This method is invoked on a schedule defined by the cron statement
-     * stored in the {@code schedule} configuration property.  By default this schedule is {@code 0 0/10 * * * *}.
+     * stored in the {@code schedule} configuration property.  By default this schedule is {@code 0 0 * * * *}.
      */
     @RequestMapping(method = RequestMethod.POST, value = "/destroy")
     @Scheduled(cron = "${schedule:0 0 * * * *}")
