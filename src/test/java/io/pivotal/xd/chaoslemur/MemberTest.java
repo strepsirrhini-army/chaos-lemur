@@ -7,11 +7,13 @@ package io.pivotal.xd.chaoslemur;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public final class MemberTest {
 
     private final Member member = new Member("test-id", "test-name", "test-group");
+    private final Member compare = new Member("compare-id", "compare-name", "compare-group");
 
     @Test
     public void test() {
@@ -34,7 +36,13 @@ public final class MemberTest {
     }
 
     @Test
+    public void compareTo() {
+        assertEquals((this.member.compareTo(compare)), 17);
+    }
+
+    @Test
     public void toStringTest() {
         assertTrue(this.member.toString().equals("[id: test-id, name: test-name, group: test-group]"));
     }
+
 }

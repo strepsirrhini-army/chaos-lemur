@@ -4,14 +4,15 @@
 
 package io.pivotal.xd.chaoslemur;
 
-import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import io.pivotal.xd.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
+import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -27,13 +28,16 @@ public final class DestroyerTest {
 
     private final Reporter reporter = mock(Reporter.class);
 
-    private final Destroyer destroyer = new Destroyer(reporter, this.infrastructure, "0/11 * * * * *", this.fateEngine);
+    private final ExecutorService executor = mock(ExecutorService.class);
+
+    private final Destroyer destroyer = new Destroyer(this.reporter, this.infrastructure, "0/11 * * * * *", this.fateEngine, this.executor);
 
     private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
 
     private final Member member2 = new Member("test-id-2", "test-name-2", "test-group");
 
     private final Set<Member> members = new HashSet<>();
+
 
     @Before
     public void members() {
