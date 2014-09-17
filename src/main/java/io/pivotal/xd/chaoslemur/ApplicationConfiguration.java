@@ -4,7 +4,6 @@
 
 package io.pivotal.xd.chaoslemur;
 
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +14,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.security.SecureRandom;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
 
 /**
  * Main entry point and configuration class
@@ -46,11 +44,11 @@ public class ApplicationConfiguration {
     }
 
     @Bean(destroyMethod = "shutdown")
-    FactoryBean<ExecutorService> taskExecutor() {
+    ThreadPoolExecutorFactoryBean executor() {
         ThreadPoolExecutorFactoryBean factoryBean = new ThreadPoolExecutorFactoryBean();
-        factoryBean.setCorePoolSize(5);
-        factoryBean.setMaxPoolSize(20);
-        factoryBean.setQueueCapacity(0);
+        factoryBean.setCorePoolSize(1);
+        factoryBean.setMaxPoolSize(5);
+        factoryBean.setThreadNamePrefix("destroyer-");
 
         return factoryBean;
     }

@@ -10,9 +10,10 @@ import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -30,19 +31,18 @@ public final class DestroyerTest {
 
     private final ExecutorService executor = mock(ExecutorService.class);
 
-    private final Destroyer destroyer = new Destroyer(this.reporter, this.infrastructure, "0/11 * * * * *", this.fateEngine, this.executor);
+    private final Destroyer destroyer = new Destroyer(this.reporter, this.infrastructure, "0/11 * * * * *",
+            this.executor, this.fateEngine);
 
     private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
 
     private final Member member2 = new Member("test-id-2", "test-name-2", "test-group");
 
-    private final Set<Member> members = new HashSet<>();
+    private final Set<Member> members = Stream.of(this.member1, this.member2).collect(Collectors.toSet());
 
 
     @Before
     public void members() {
-        this.members.add(this.member1);
-        this.members.add(this.member2);
         when(this.infrastructure.getMembers()).thenReturn(this.members);
     }
 

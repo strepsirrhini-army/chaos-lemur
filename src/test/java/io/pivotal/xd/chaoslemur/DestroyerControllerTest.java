@@ -6,13 +6,16 @@ package io.pivotal.xd.chaoslemur;
 
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import io.pivotal.xd.chaoslemur.reporter.Reporter;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.core.task.SyncTaskExecutor;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executor;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -32,46 +35,55 @@ public final class DestroyerControllerTest {
 
     private final Reporter reporter = mock(Reporter.class);
 
-    private final ExecutorService executor = mock(ExecutorService.class);
+    private final Executor executor = new SyncTaskExecutor();
 
-    private final MockMvc mockMvc = standaloneSetup(new Destroyer(this.reporter, this.infrastructure, "",
-            this.fateEngine, this.executor)).build();
+    private final Destroyer destroyer = new Destroyer(this.reporter, this.infrastructure, "", this.executor,
+            this.fateEngine);
 
-    private final Member member = new Member("test-id", "test-name", "test-group");
+    private final MockMvc mockMvc = standaloneSetup(this.destroyer).build();
 
-    private final Set<Member> members = new HashSet<>();
+    private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
+
+    private final Member member2 = new Member("test-id-2", "test-name-2", "test-group");
+
+    private final Set<Member> members = Stream.of(this.member1, this.member2).collect(Collectors.toSet());
+
+    @Before
+    public void members() {
+        when(this.infrastructure.getMembers()).thenReturn(this.members);
+        when(this.fateEngine.shouldDie(this.member1)).thenReturn(true);
+        when(this.fateEngine.shouldDie(this.member2)).thenReturn(false);
+    }
 
     @Test
     public void destroyWhenPaused() throws Exception {
-        Destroyer destroyer = new Destroyer(this.reporter, this.infrastructure, "", this.fateEngine, this.executor);
-
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"status\":\"paused\"}"))
-                .andExpect(status().isOk());
-        destroyer.destroy();
+                .andExpect(status().isAccepted());
 
-        verify(this.infrastructure, times(0)).destroy(member);
+        this.destroyer.destroy();
+
+        verify(this.infrastructure, times(0)).destroy(this.member1);
+        verify(this.infrastructure, times(0)).destroy(this.member2);
     }
 
     @Test
     public void state() throws Exception {
         this.mockMvc.perform(get("/state"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("{\"status\":\"running\"}"));
+                .andExpect(content().string("{\"status\":\"RUNNING\"}"));
     }
 
     @Test
     public void destroy() throws Exception {
-        members.add(member);
-
-        when(this.infrastructure.getMembers()).thenReturn(members);
-        when(this.fateEngine.shouldDie(member)).thenReturn(true);
-
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"status\":\"destroying\"}"))
                 .andExpect(status().isAccepted());
+
+        verify(this.infrastructure).destroy(this.member1);
+        verify(this.infrastructure, times(0)).destroy(this.member2);
     }
 
     @Test
@@ -79,10 +91,10 @@ public final class DestroyerControllerTest {
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"status\":\"paused\"}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
         this.mockMvc.perform(get("/state")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"status\":\"paused\"}"))
+                .content("{\"status\":\"PAUSED\"}"))
                 .andExpect(status().isOk());
     }
 
@@ -91,10 +103,10 @@ public final class DestroyerControllerTest {
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"status\":\"running\"}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
         this.mockMvc.perform(get("/state")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"status\":\"running\"}"))
+                .content("{\"status\":\"RUNNING\"}"))
                 .andExpect(status().isOk());
     }
 
@@ -103,7 +115,7 @@ public final class DestroyerControllerTest {
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"status\":\"foo\"}"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -111,13 +123,13 @@ public final class DestroyerControllerTest {
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"foo\":\"bar\"}"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     public void invalidURL() throws Exception {
         this.mockMvc.perform(post("/state?status=paused"))
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().isUnsupportedMediaType());
     }
 
 }
