@@ -7,7 +7,6 @@ package io.pivotal.xd.chaoslemur;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public final class MemberTest {
@@ -37,7 +36,7 @@ public final class MemberTest {
 
     @Test
     public void compareTo() {
-        assertEquals((this.member.compareTo(compare)), 17);
+        assertTrue(this.member.compareTo(compare) > 0);
     }
 
     @Test

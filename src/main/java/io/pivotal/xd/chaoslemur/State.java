@@ -8,33 +8,25 @@ import java.util.Map;
 
 public enum State {
 
-    DESTROYING("destroying"),
-    PAUSED("paused"),
-    RUNNING("running"),
-    UNKNOWN("");
+    DESTROYING,
+    PAUSED,
+    RUNNING;
 
     private static final String STATUS_KEY = "status";
-
-    private final String state;
-
-    private State(String state) {
-        this.state = state;
-    }
 
     public static State parse(Map<String, String> payload) {
         String value = payload.get(STATUS_KEY);
 
-        for (State candidate : values()) {
-            if (candidate.state.equals(value)) {
-                return candidate;
-            }
+        if (value == null) {
+            throw new IllegalArgumentException("Payload is missing key 'status'");
         }
-        return UNKNOWN;
-    }
 
-    @Override
-    public String toString() {
-        return this.state;
+        try {
+            return State.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    String.format("'%s' is an illegal value for key '%s'", value, STATUS_KEY), e);
+        }
     }
 
 }
