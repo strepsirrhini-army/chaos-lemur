@@ -7,11 +7,12 @@ package io.pivotal.xd.chaoslemur;
 import io.pivotal.xd.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import io.pivotal.xd.chaoslemur.reporter.Reporter;
+import io.pivotal.xd.chaoslemur.state.State;
+import io.pivotal.xd.chaoslemur.state.StateProvider;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,17 +30,16 @@ public final class DestroyerTest {
 
     private final Reporter reporter = mock(Reporter.class);
 
-    private final ExecutorService executor = mock(ExecutorService.class);
+    private final StateProvider stateProvider = mock(StateProvider.class);
 
-    private final Destroyer destroyer = new Destroyer(this.reporter, this.infrastructure, "0/11 * * * * *",
-            this.executor, this.fateEngine);
+    private final Destroyer destroyer = new Destroyer(this.fateEngine, this.infrastructure, this.reporter,
+            this.stateProvider, "0/11 * * * * *");
 
     private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
 
     private final Member member2 = new Member("test-id-2", "test-name-2", "test-group");
 
     private final Set<Member> members = Stream.of(this.member1, this.member2).collect(Collectors.toSet());
-
 
     @Before
     public void members() {
@@ -63,6 +63,16 @@ public final class DestroyerTest {
         doThrow(new DestructionException()).when(this.infrastructure).destroy(this.member1);
 
         this.destroyer.destroy();
+    }
+
+    @Test
+    public void destroyWhenStopped() throws DestructionException {
+        when(stateProvider.get()).thenReturn(State.STOPPED);
+
+        this.destroyer.destroy();
+
+        verify(this.infrastructure, times(0)).getMembers();
+
     }
 
 }

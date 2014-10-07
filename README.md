@@ -2,7 +2,7 @@
 This project is a self-hostable application to randomly destroy virtual machines in an environment, as an aid to resilience testing of HA environments. Its main features are:
 
  - Triggers on a user-defined schedule, selecting 0 or more VMs to destroy at random during each run.
- - User defined groups of VMs, with per-group probabilities for destruction of member VMs.
+ - Users can define groups of VMs, with per-group probabilities for destruction of member VMs.
  - Optionally blacklists groups to protect their members from destruction.
  - Runs against different VM environments (e.g. AWS, vSphere) using an infrastructure API.
  - Records activities to [DataDog].
@@ -30,6 +30,9 @@ Since the application is designed to work in a PaaS environment, all configurati
 | `SCHEDULE` | The schedule to trigger a run of Chaos Lemur. Defined using Spring cron syntax, so `0 0/10 * * * *` would run every 10 minutes. Default is  `0 0 * * * *` (once per hour, on the hour).
 
 
+### Services
+Chaos Lemur uses Redis to persist its status across restarts (e,g. if the PaaS environment forces a reboot). To do this it requires a [Redis Cloud instance] called `chaos-lemur-persistence`. Chaos Lemur only requires a few bytes of storage, so the smallest Redis plan should be sufficient.
+
 ## Deployment
 _The following instructions assume that you have [created an account][cloud-foundry-account] and [installed the `cf` command line tool]._
 
@@ -48,14 +51,13 @@ cf logs chaos-lemur --recent
 
 
 ## API
-Chaos Lemur is designed to run continuously, destroying VMs on a definable schedule. To help with testing and development it is possible to pause and resume destroys, and initiate ad hoc destroys, using its RESTful API. All data is sent and received as `application/json`.
+Chaos Lemur is designed to run continuously, destroying VMs on a definable schedule. To help with testing and development it is possible to pause and resume destroys using its RESTful API. All data is sent and received as `application/json`.
 
 | Call | Payload | Status | Description
 | ---- | ------- | :----: | -----------
-| `GET  /state` | `{ "status": "[PAUSED / DESTROYING / RUNNING]" }`| `200` | Return the current status
-| `POST /state` | `{ "status": "PAUSED" }` | `202` | Pause Chaos Lemur indefinitely
-| `POST /state` | `{ "status": "RUNNING" }` | `202` | Resume Chaos Lemur
-| `POST /state` | `{ "status": "DESTROYING" }` | `202` | Initiate a round of destroys. The destroys will happen even if Chaos Lemur is paused.
+| `GET  /state` | `{ "status": "[STOPPED / STARTED]" }`| `200` | Return the current status
+| `POST /state` | `{ "status": "STOPPED" }` | `202` | Pause Chaos Lemur indefinitely
+| `POST /state` | `{ "status": "STARTED" }` | `202` | Resume Chaos Lemur
 
 
 ## Developing
@@ -66,7 +68,7 @@ The project is set up as a Maven project and doesn't have any special requiremen
 
 Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
 
-
+[Redis Cloud instance]: http://docs.run.pivotal.io/marketplace/services/rediscloud.html
 [cloud-foundry-account]: https://console.run.pivotal.io/register
 [DataDog]: https://www.datadoghq.com
 [installed the `cf` command line tool]: http://docs.run.pivotal.io/devguide/installcf/install-go-cli.html

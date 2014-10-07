@@ -7,26 +7,19 @@ package io.pivotal.xd.chaoslemur;
 import io.pivotal.xd.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import io.pivotal.xd.chaoslemur.reporter.Reporter;
+import io.pivotal.xd.chaoslemur.state.State;
+import io.pivotal.xd.chaoslemur.state.StateProvider;
 import org.atteo.evo.inflector.English;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
 @RestController
@@ -34,27 +27,23 @@ final class Destroyer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final Executor executor;
-
     private final FateEngine fateEngine;
 
     private final Infrastructure infrastructure;
 
-    private final Object monitor = new Object();
-
     private final Reporter reporter;
 
-    private volatile State state = State.RUNNING;
+    private final StateProvider stateProvider;
 
     @Autowired
-    Destroyer(Reporter reporter, Infrastructure infrastructure, @Value("${schedule:0 0 * * * *}") String
-            schedule, Executor executor, FateEngine fateEngine) {
-        this.reporter = reporter;
-        this.executor = executor;
+    Destroyer(FateEngine fateEngine, Infrastructure infrastructure, Reporter reporter, StateProvider stateProvider,
+              @Value("${schedule:0 0 * * * *}") String schedule) {
+        this.logger.info("Destruction schedule: {}", schedule);
+
         this.fateEngine = fateEngine;
         this.infrastructure = infrastructure;
-
-        this.logger.info("Destruction schedule: {}", schedule);
+        this.reporter = reporter;
+        this.stateProvider = stateProvider;
     }
 
     /**
@@ -63,51 +52,15 @@ final class Destroyer {
      */
     @Scheduled(cron = "${schedule:0 0 * * * *}")
     public void destroy() {
-        synchronized (this.monitor) {
-            if (this.state.equals(State.PAUSED)) {
-                this.logger.info("Chaos Lemur paused");
-                return;
-            }
-
-            doDestroy();
+        if (State.STOPPED == this.stateProvider.get()) {
+            this.logger.info("Chaos Lemur stopped");
+            return;
         }
-    }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/state")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    void changeState(@RequestBody Map<String, String> payload) {
-        State targetState = State.parse(payload);
-
-        this.executor.execute(() -> {
-            synchronized (Destroyer.this.monitor) {
-                if (targetState == State.RUNNING || targetState == State.PAUSED) {
-                    Destroyer.this.state = targetState;
-                    return;
-                }
-
-                doDestroy();
-            }
-        });
-    }
-
-    @RequestMapping(method = RequestMethod.GET, value = "/state")
-    Map<String, State> reportState() {
-        synchronized (this.monitor) {
-            Map<String, State> message = new HashMap<>();
-            message.put("status", this.state);
-            return message;
-        }
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void handleParsingException() {
+        doDestroy();
     }
 
     private void doDestroy() {
-        State previousState = this.state;
-        this.state = State.DESTROYING;
-
         UUID identifier = UUID.randomUUID();
         this.logger.info("{} Beginning run...", identifier);
 
@@ -127,7 +80,6 @@ final class Destroyer {
         });
 
         this.reporter.sendEvent(title(identifier), message(destroyedMembers));
-        this.state = previousState;
     }
 
     private String message(List<Member> members) {
@@ -147,5 +99,4 @@ final class Destroyer {
     private String title(UUID identifier) {
         return String.format("Chaos Lemur Destruction (%s)", identifier);
     }
-
 }
