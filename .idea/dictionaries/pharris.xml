@@ -2,6 +2,7 @@
   <dictionary name="pharris">
     <words>
       <w>logback</w>
+      <w>vcap</w>
     </words>
   </dictionary>
 </component>

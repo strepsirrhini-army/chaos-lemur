@@ -16,7 +16,7 @@ class ReporterConfiguration {
 
     @Bean
     @ConditionalOnProperty("dataDog.apiKey")
-    Reporter DataDogReporter(@Value("${dataDog.apiKey}") String apiKey, @Value("${dataDog.appKey}") String appKey,
+    Reporter dataDogReporter(@Value("${dataDog.apiKey}") String apiKey, @Value("${dataDog.appKey}") String appKey,
                             RestTemplate restTemplate) {
         return new DataDogReporter(apiKey, appKey, restTemplate);
     }
