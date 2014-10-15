@@ -2,6 +2,7 @@
 This project is a self-hostable application to randomly destroy virtual machines in an environment, as an aid to resilience testing of HA environments. Its main features are:
 
  - Triggers on a user-defined schedule, selecting 0 or more VMs to destroy at random during each run.
+ - Manually trigger ad hoc destroys.
  - Users can define groups of VMs, with per-group probabilities for destruction of member VMs.
  - Optionally blacklists groups to protect their members from destruction.
  - Runs against different VM environments (e.g. AWS, vSphere) using an infrastructure API.
@@ -58,6 +59,7 @@ Chaos Lemur is designed to run continuously, destroying VMs on a definable sched
 | `GET  /state` | `{ "status": "[STOPPED / STARTED]" }`| `200` | Return the current status
 | `POST /state` | `{ "status": "STOPPED" }` | `202` | Pause Chaos Lemur indefinitely
 | `POST /state` | `{ "status": "STARTED" }` | `202` | Resume Chaos Lemur
+| `POST /chaos` | `{ "event": "DESTROY" }` | `202` | Initiate a round of destroys. The destroys will happen even if Chaos Lemur is stopped.
 
 
 ## Developing

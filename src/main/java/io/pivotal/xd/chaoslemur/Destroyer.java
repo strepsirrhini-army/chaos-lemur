@@ -14,10 +14,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
@@ -58,6 +64,22 @@ final class Destroyer {
         }
 
         doDestroy();
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/chaos")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    void eventRequest(@RequestBody Map<String, String> payload) {
+        String value = payload.get("event");
+
+        if (value == null) {
+            throw new IllegalArgumentException("Payload is missing key 'event'");
+        }
+
+        if ("destroy".equals(value.toLowerCase())) {
+            doDestroy();
+        } else {
+            throw new IllegalArgumentException(String.format("Event type of '%s' is not recognized", value));
+        }
     }
 
     private void doDestroy() {

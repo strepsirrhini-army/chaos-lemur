@@ -5,7 +5,6 @@
 package io.pivotal.xd.chaoslemur.state;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -18,7 +17,7 @@ import java.util.Map;
 @RestController
 abstract class AbstractRestControllerStateProvider implements StateProvider {
 
-    static final String STATUS_KEY = "status";
+    private static final String STATUS_KEY = "status";
 
     protected abstract void set(State state);
 
@@ -44,11 +43,6 @@ abstract class AbstractRestControllerStateProvider implements StateProvider {
         Map<String, State> message = new HashMap<>();
         message.put(STATUS_KEY, get());
         return message;
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    void handleParsingException() {
     }
 
 }
