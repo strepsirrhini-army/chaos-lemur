@@ -4,6 +4,8 @@
 
 package io.pivotal.xd.chaoslemur;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -51,6 +53,12 @@ public class ApplicationConfiguration {
         factoryBean.setThreadNamePrefix("destroyer-");
 
         return factoryBean;
+    }
+
+    @Bean
+    ObjectMapper objectMapper() {
+        return new ObjectMapper()
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
 }

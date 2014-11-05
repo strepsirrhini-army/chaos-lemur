@@ -9,16 +9,16 @@ import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import io.pivotal.xd.chaoslemur.state.State;
 import io.pivotal.xd.chaoslemur.state.StateProvider;
+import io.pivotal.xd.chaoslemur.task.Task;
+import io.pivotal.xd.chaoslemur.task.TaskRepository;
+import io.pivotal.xd.chaoslemur.task.TaskUriBuilder;
+import io.pivotal.xd.chaoslemur.task.Trigger;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.method.annotation.ExceptionHandlerMethodResolver;
-import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
-import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod;
 
-import java.lang.reflect.Method;
+import java.net.URI;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,6 +29,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
@@ -42,11 +43,14 @@ public final class DestroyerTest {
 
     private final StateProvider stateProvider = mock(StateProvider.class);
 
-    private final Destroyer destroyer = new Destroyer(this.fateEngine, this.infrastructure, this.reporter,
-            this.stateProvider, "");
+    private final TaskRepository taskRepository = mock(TaskRepository.class);
 
-    private final MockMvc mockMvc = standaloneSetup(this.destroyer)
-            .setHandlerExceptionResolvers(createExceptionResolver()).build();
+    private final TaskUriBuilder taskUriBuilder = mock(TaskUriBuilder.class);
+
+    private final Destroyer destroyer = new Destroyer(this.fateEngine, this.infrastructure, this.reporter,
+            this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
+
+    private final MockMvc mockMvc = standaloneSetup(this.destroyer).build();
 
     private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
 
@@ -59,6 +63,7 @@ public final class DestroyerTest {
         when(this.infrastructure.getMembers()).thenReturn(this.members);
         when(this.fateEngine.shouldDie(this.member1)).thenReturn(true);
         when(this.fateEngine.shouldDie(this.member2)).thenReturn(false);
+        when(this.taskRepository.create(Trigger.SCHEDULED)).thenReturn(new Task(1L, Trigger.SCHEDULED));
     }
 
     @Test
@@ -78,7 +83,7 @@ public final class DestroyerTest {
 
     @Test
     public void destroyWhenStopped() throws DestructionException {
-        when(stateProvider.get()).thenReturn(State.STOPPED);
+        when(this.stateProvider.get()).thenReturn(State.STOPPED);
 
         this.destroyer.destroy();
 
@@ -87,10 +92,15 @@ public final class DestroyerTest {
 
     @Test
     public void manualDestroy() throws Exception {
+        Task task = new Task(2L, Trigger.MANUAL);
+        when(this.taskRepository.create(Trigger.MANUAL)).thenReturn(task);
+        when(this.taskUriBuilder.getUri(task)).thenReturn(URI.create("http://foo.com"));
+
         this.mockMvc.perform(post("/chaos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"event\":\"destroy\"}"))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isAccepted())
+                .andExpect(header().string("Location", "http://foo.com"));
 
         verify(this.infrastructure).destroy(this.member1);
         verify(this.infrastructure, times(0)).destroy(this.member2);
@@ -114,18 +124,6 @@ public final class DestroyerTest {
                 .andExpect(status().isBadRequest());
 
         verify(this.infrastructure, times(0)).destroy(this.member1);
-    }
-
-    private ExceptionHandlerExceptionResolver createExceptionResolver() {
-        ExceptionHandlerExceptionResolver exceptionResolver = new ExceptionHandlerExceptionResolver() {
-            protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod,
-                                                                              Exception exception) {
-                Method method = new ExceptionHandlerMethodResolver(ControllerSupport.class).resolveMethod(exception);
-                return new ServletInvocableHandlerMethod(new ControllerSupport(), method);
-            }
-        };
-        exceptionResolver.afterPropertiesSet();
-        return exceptionResolver;
     }
 
 }

@@ -5,10 +5,11 @@
 package io.pivotal.xd.chaoslemur.state;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -21,24 +22,24 @@ abstract class AbstractRestControllerStateProvider implements StateProvider {
 
     protected abstract void set(State state);
 
-    @RequestMapping(method = RequestMethod.POST, value = "/state")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    void changeState(@RequestBody Map<String, String> payload) {
+    @RequestMapping(method = RequestMethod.POST, value = "/state", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> changeState(@RequestBody Map<String, String> payload) {
         String value = payload.get(STATUS_KEY);
 
         if (value == null) {
-            throw new IllegalArgumentException("Payload is missing key 'status'");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         try {
             set(State.valueOf(value.toUpperCase()));
+            return new ResponseEntity<>(HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(
-                    String.format("'%s' is an illegal value for '%s'", value, STATUS_KEY), e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = "/state")
+    @RequestMapping(method = RequestMethod.GET, value = "/state", produces = MediaType.APPLICATION_JSON_VALUE)
     Map<String, State> reportState() {
         Map<String, State> message = new HashMap<>();
         message.put(STATUS_KEY, get());
