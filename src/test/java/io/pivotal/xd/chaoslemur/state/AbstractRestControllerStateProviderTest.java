@@ -4,16 +4,9 @@
 
 package io.pivotal.xd.chaoslemur.state;
 
-import io.pivotal.xd.chaoslemur.ControllerSupport;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.method.HandlerMethod;
-import org.springframework.web.method.annotation.ExceptionHandlerMethodResolver;
-import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
-import org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod;
-
-import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -27,8 +20,7 @@ public final class AbstractRestControllerStateProviderTest {
 
     private final StubRestControllerStateProvider restControllerStateProvider = new StubRestControllerStateProvider();
 
-    private final MockMvc mockMvc = standaloneSetup(this.restControllerStateProvider)
-            .setHandlerExceptionResolvers(createExceptionResolver()).build();
+    private final MockMvc mockMvc = standaloneSetup(this.restControllerStateProvider).build();
 
     @Test
     public void state() throws Exception {
@@ -42,7 +34,7 @@ public final class AbstractRestControllerStateProviderTest {
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"status\":\"stopped\"}"))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isOk());
 
         assertEquals(State.STOPPED, this.restControllerStateProvider.setState);
     }
@@ -52,7 +44,7 @@ public final class AbstractRestControllerStateProviderTest {
         this.mockMvc.perform(post("/state")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"status\":\"started\"}"))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isOk());
 
         assertEquals(State.STARTED, this.restControllerStateProvider.setState);
     }
@@ -90,18 +82,6 @@ public final class AbstractRestControllerStateProviderTest {
         public State get() {
             return State.STARTED;
         }
-    }
-
-    private ExceptionHandlerExceptionResolver createExceptionResolver() {
-        ExceptionHandlerExceptionResolver exceptionResolver = new ExceptionHandlerExceptionResolver() {
-            protected ServletInvocableHandlerMethod getExceptionHandlerMethod(HandlerMethod handlerMethod,
-                                                                              Exception exception) {
-                Method method = new ExceptionHandlerMethodResolver(ControllerSupport.class).resolveMethod(exception);
-                return new ServletInvocableHandlerMethod(new ControllerSupport(), method);
-            }
-        };
-        exceptionResolver.afterPropertiesSet();
-        return exceptionResolver;
     }
 
 }

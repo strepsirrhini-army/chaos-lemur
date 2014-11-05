@@ -2,9 +2,9 @@
 This project is a self-hostable application to randomly destroy virtual machines in an environment, as an aid to resilience testing of HA environments. Its main features are:
 
  - Triggers on a user-defined schedule, selecting 0 or more VMs to destroy at random during each run.
- - Manually trigger ad hoc destroys.
- - Users can define groups of VMs, with per-group probabilities for destruction of member VMs.
- - Optionally blacklists groups to protect their members from destruction.
+ - Manual triggering of unscheduled destroys.
+ - User-defined groups of VMs, with per-group probabilities for destruction of member VMs.
+ - Optional blacklisting of groups to protect their members from destruction.
  - Runs against different VM environments (e.g. AWS, vSphere) using an infrastructure API.
  - Records activities to [DataDog].
 
@@ -27,7 +27,7 @@ Since the application is designed to work in a PaaS environment, all configurati
 | `DATADOG_APIKEY` | Allows Chaos Lemur to log destruction events to [DataDog]. If this value is not set Chaos Lemur will redirect the output to the local logger.
 | `DATADOG_APPKEY` | Used with the `DATADOG_APIKEY` to give DataDog access.
 | `DEFAULT_PROBABILITY` | The default probability for a VM to be destroyed, ranging from `0.0` (will never be destroyed) to `1.0` (will always be destroyed). The probability is per run, with each run independent of any other. Default is `0.2`.
-| `<GROUP>_PROBABILITY` | The probability for a given group, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the redis group will be destroyed less often than a default VM.
+| `<GROUP>_PROBABILITY` | The probability for a given group, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the redis group will be destroyed more often than a default VM.
 | `SCHEDULE` | The schedule to trigger a run of Chaos Lemur. Defined using Spring cron syntax, so `0 0/10 * * * *` would run every 10 minutes. Default is  `0 0 * * * *` (once per hour, on the hour).
 
 
@@ -56,10 +56,12 @@ Chaos Lemur is designed to run continuously, destroying VMs on a definable sched
 
 | Call | Payload | Status | Description
 | ---- | ------- | :----: | -----------
-| `GET  /state` | `{ "status": "[STOPPED / STARTED]" }`| `200` | Return the current status
+| `GET  /state` | `{ "status": "[STOPPED | STARTED]" }`| `200` | Return the current status
 | `POST /state` | `{ "status": "STOPPED" }` | `202` | Pause Chaos Lemur indefinitely
 | `POST /state` | `{ "status": "STARTED" }` | `202` | Resume Chaos Lemur
-| `POST /chaos` | `{ "event": "DESTROY" }` | `202` | Initiate a round of destroys. The destroys will happen even if Chaos Lemur is stopped.
+| `POST /chaos` | `{ "event": "DESTROY" }` | `202` | Initiate a round of destroys. The destroys will happen even if Chaos Lemur is stopped. Returns the `Location` of a task for the destroy.
+| `GET /task` | - | `200` | Reports the above information for all tasks.
+| `GET /task/{id}` | - | `200` | Reports the status (`{ "COMPLETE | IN_PROGRESS" }`), trigger (`{ MANUAL | SCHEDULED )`), start date/time, and links for task `{id}`.
 
 
 ## Developing

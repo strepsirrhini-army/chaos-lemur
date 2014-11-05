@@ -9,17 +9,23 @@ import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
 import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import io.pivotal.xd.chaoslemur.state.State;
 import io.pivotal.xd.chaoslemur.state.StateProvider;
+import io.pivotal.xd.chaoslemur.task.Task;
+import io.pivotal.xd.chaoslemur.task.TaskRepository;
+import io.pivotal.xd.chaoslemur.task.TaskUriBuilder;
+import io.pivotal.xd.chaoslemur.task.Trigger;
 import org.atteo.evo.inflector.English;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -41,15 +47,21 @@ final class Destroyer {
 
     private final StateProvider stateProvider;
 
+    private final TaskRepository taskRepository;
+
+    private final TaskUriBuilder taskUriBuilder;
+
     @Autowired
     Destroyer(FateEngine fateEngine, Infrastructure infrastructure, Reporter reporter, StateProvider stateProvider,
-              @Value("${schedule:0 0 * * * *}") String schedule) {
+              @Value("${schedule:0 0 * * * *}") String schedule, TaskRepository taskRepository,
+              TaskUriBuilder taskUriBuilder) {
         this.logger.info("Destruction schedule: {}", schedule);
-
         this.fateEngine = fateEngine;
         this.infrastructure = infrastructure;
         this.reporter = reporter;
         this.stateProvider = stateProvider;
+        this.taskRepository = taskRepository;
+        this.taskUriBuilder = taskUriBuilder;
     }
 
     /**
@@ -63,30 +75,36 @@ final class Destroyer {
             return;
         }
 
-        doDestroy();
+        doDestroy(this.taskRepository.create(Trigger.SCHEDULED));
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/chaos")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    void eventRequest(@RequestBody Map<String, String> payload) {
+
+    @RequestMapping(method = RequestMethod.POST, value = "/chaos", consumes = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<?> eventRequest(@RequestBody Map<String, String> payload) {
         String value = payload.get("event");
 
         if (value == null) {
-            throw new IllegalArgumentException("Payload is missing key 'event'");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        HttpHeaders responseHeaders = new HttpHeaders();
 
         if ("destroy".equals(value.toLowerCase())) {
-            doDestroy();
+            Task task = this.taskRepository.create(Trigger.MANUAL);
+            doDestroy(task); //TODO: Thread this!
+            responseHeaders.setLocation(this.taskUriBuilder.getUri(task));
         } else {
-            throw new IllegalArgumentException(String.format("Event type of '%s' is not recognized", value));
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+
+        return new ResponseEntity<>(responseHeaders, HttpStatus.ACCEPTED);
     }
 
-    private void doDestroy() {
-        UUID identifier = UUID.randomUUID();
-        this.logger.info("{} Beginning run...", identifier);
-
+    private void doDestroy(Task task) {
         List<Member> destroyedMembers = new CopyOnWriteArrayList<>();
+        UUID identifier = UUID.randomUUID();
+
+        this.logger.info("{} Beginning run...", identifier);
 
         this.infrastructure.getMembers().parallelStream().forEach((member) -> {
             if (this.fateEngine.shouldDie(member)) {
@@ -102,6 +120,8 @@ final class Destroyer {
         });
 
         this.reporter.sendEvent(title(identifier), message(destroyedMembers));
+
+        task.stop();
     }
 
     private String message(List<Member> members) {
