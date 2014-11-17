@@ -32,12 +32,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 @RestController
 final class Destroyer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    private final ExecutorService executorService;
 
     private final FateEngine fateEngine;
 
@@ -52,10 +56,12 @@ final class Destroyer {
     private final TaskUriBuilder taskUriBuilder;
 
     @Autowired
-    Destroyer(FateEngine fateEngine, Infrastructure infrastructure, Reporter reporter, StateProvider stateProvider,
+    Destroyer(ExecutorService executorService, FateEngine fateEngine, Infrastructure infrastructure, Reporter
+            reporter, StateProvider stateProvider,
               @Value("${schedule:0 0 * * * *}") String schedule, TaskRepository taskRepository,
               TaskUriBuilder taskUriBuilder) {
         this.logger.info("Destruction schedule: {}", schedule);
+        this.executorService = executorService;
         this.fateEngine = fateEngine;
         this.infrastructure = infrastructure;
         this.reporter = reporter;
@@ -78,7 +84,6 @@ final class Destroyer {
         doDestroy(this.taskRepository.create(Trigger.SCHEDULED));
     }
 
-
     @RequestMapping(method = RequestMethod.POST, value = "/chaos", consumes = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<?> eventRequest(@RequestBody Map<String, String> payload) {
         String value = payload.get("event");
@@ -91,7 +96,7 @@ final class Destroyer {
 
         if ("destroy".equals(value.toLowerCase())) {
             Task task = this.taskRepository.create(Trigger.MANUAL);
-            doDestroy(task); //TODO: Thread this!
+            this.executorService.execute(() -> doDestroy(task));
             responseHeaders.setLocation(this.taskUriBuilder.getUri(task));
         } else {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -106,16 +111,25 @@ final class Destroyer {
 
         this.logger.info("{} Beginning run...", identifier);
 
-        this.infrastructure.getMembers().parallelStream().forEach((member) -> {
-            if (this.fateEngine.shouldDie(member)) {
-                try {
-                    this.logger.debug("{} Destroying: {}", identifier, member);
-                    this.infrastructure.destroy(member);
-                    this.logger.info("{} Destroyed: {}", identifier, member);
-                    destroyedMembers.add(member);
-                } catch (DestructionException e) {
-                    this.logger.warn("{} Destroy failed: {} ({})", identifier, member, e.getMessage());
+        this.infrastructure.getMembers().stream().map(member -> {
+            return this.executorService.submit(() -> {
+                if (this.fateEngine.shouldDie(member)) {
+                    try {
+                        this.logger.debug("{} Destroying: {}", identifier, member);
+                        this.infrastructure.destroy(member);
+                        this.logger.info("{} Destroyed: {}", identifier, member);
+                        destroyedMembers.add(member);
+                    } catch (DestructionException e) {
+                        this.logger.warn("{} Destroy failed: {} ({})", identifier, member, e.getMessage());
+                    }
                 }
+
+            });
+        }).forEach(future -> {
+            try {
+                future.get();
+            } catch (InterruptedException | ExecutionException e) {
+                this.logger.error(e.getMessage());
             }
         });
 
@@ -141,4 +155,5 @@ final class Destroyer {
     private String title(UUID identifier) {
         return String.format("Chaos Lemur Destruction (%s)", identifier);
     }
+
 }

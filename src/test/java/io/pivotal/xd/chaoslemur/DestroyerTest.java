@@ -15,16 +15,23 @@ import io.pivotal.xd.chaoslemur.task.TaskUriBuilder;
 import io.pivotal.xd.chaoslemur.task.Trigger;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.net.URI;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,7 +42,13 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public final class DestroyerTest {
 
+    private final ArgumentCaptor<Runnable> runnableCaptor = ArgumentCaptor.forClass(Runnable.class);
+
+    private final ExecutorService executorService = mock(ExecutorService.class);
+
     private final FateEngine fateEngine = mock(FateEngine.class);
+
+    private final Future future = mock(Future.class);
 
     private final Infrastructure infrastructure = mock(Infrastructure.class);
 
@@ -47,8 +60,8 @@ public final class DestroyerTest {
 
     private final TaskUriBuilder taskUriBuilder = mock(TaskUriBuilder.class);
 
-    private final Destroyer destroyer = new Destroyer(this.fateEngine, this.infrastructure, this.reporter,
-            this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
+    private final Destroyer destroyer = new Destroyer(this.executorService, this.fateEngine, this.infrastructure,
+            this.reporter, this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
 
     private final MockMvc mockMvc = standaloneSetup(this.destroyer).build();
 
@@ -66,19 +79,40 @@ public final class DestroyerTest {
         when(this.taskRepository.create(Trigger.SCHEDULED)).thenReturn(new Task(1L, Trigger.SCHEDULED));
     }
 
+    @Before
+    @SuppressWarnings("unchecked")
+    public void executor() throws ExecutionException, InterruptedException {
+        when(this.executorService.submit(any(Runnable.class))).thenReturn(this.future);
+        when(this.future.get()).thenReturn(true);
+    }
+
     @Test
     public void destroy() throws DestructionException {
         this.destroyer.destroy();
 
+        runRunnables();
+
         verify(this.infrastructure).destroy(this.member1);
-        verify(this.infrastructure, times(0)).destroy(this.member2);
+        verify(this.infrastructure, never()).destroy(this.member2);
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void destroyFail() throws DestructionException {
         doThrow(new DestructionException()).when(this.infrastructure).destroy(this.member1);
 
         this.destroyer.destroy();
+
+        verify(this.infrastructure, never()).destroy(this.member1);
+    }
+
+    @Test
+    public void destroyError() throws DestructionException, IllegalStateException {
+        doThrow(new IllegalStateException()).when(this.infrastructure).destroy(this.member1);
+
+        this.destroyer.destroy();
+
+        verify(this.infrastructure, never()).destroy(this.member1);
     }
 
     @Test
@@ -87,7 +121,7 @@ public final class DestroyerTest {
 
         this.destroyer.destroy();
 
-        verify(this.infrastructure, times(0)).getMembers();
+        verify(this.infrastructure, never()).getMembers();
     }
 
     @Test
@@ -102,8 +136,10 @@ public final class DestroyerTest {
                 .andExpect(status().isAccepted())
                 .andExpect(header().string("Location", "http://foo.com"));
 
+        runRunnables();
+
         verify(this.infrastructure).destroy(this.member1);
-        verify(this.infrastructure, times(0)).destroy(this.member2);
+        verify(this.infrastructure, never()).destroy(this.member2);
     }
 
     @Test
@@ -113,7 +149,7 @@ public final class DestroyerTest {
                 .content("{\"foo\":\"destroy\"}"))
                 .andExpect(status().isBadRequest());
 
-        verify(this.infrastructure, times(0)).destroy(this.member1);
+        verify(this.infrastructure, never()).destroy(this.member1);
     }
 
     @Test
@@ -123,7 +159,15 @@ public final class DestroyerTest {
                 .content("{\"event\":\"foo\"}"))
                 .andExpect(status().isBadRequest());
 
-        verify(this.infrastructure, times(0)).destroy(this.member1);
+        verify(this.infrastructure, never()).destroy(this.member1);
+    }
+
+    private void runRunnables() {
+        verify(this.executorService, atMost(1)).execute(this.runnableCaptor.capture());
+        this.runnableCaptor.getAllValues().forEach(Runnable::run);
+
+        verify(this.executorService, times(2)).submit(this.runnableCaptor.capture());
+        this.runnableCaptor.getAllValues().forEach(Runnable::run);
     }
 
 }
