@@ -48,8 +48,9 @@ public class ApplicationConfiguration {
     @Bean(destroyMethod = "shutdown")
     ThreadPoolExecutorFactoryBean executor() {
         ThreadPoolExecutorFactoryBean factoryBean = new ThreadPoolExecutorFactoryBean();
-        factoryBean.setCorePoolSize(1);
-        factoryBean.setMaxPoolSize(5);
+        factoryBean.setQueueCapacity(0);
+        factoryBean.setCorePoolSize(5);
+        factoryBean.setMaxPoolSize(20);
         factoryBean.setThreadNamePrefix("destroyer-");
 
         return factoryBean;
