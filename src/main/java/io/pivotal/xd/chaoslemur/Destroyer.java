@@ -41,6 +41,8 @@ final class Destroyer {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    private final Boolean dryRun;
+
     private final ExecutorService executorService;
 
     private final FateEngine fateEngine;
@@ -56,11 +58,18 @@ final class Destroyer {
     private final TaskUriBuilder taskUriBuilder;
 
     @Autowired
-    Destroyer(ExecutorService executorService, FateEngine fateEngine, Infrastructure infrastructure, Reporter
-            reporter, StateProvider stateProvider,
-              @Value("${schedule:0 0 * * * *}") String schedule, TaskRepository taskRepository,
+    Destroyer(@Value("${dryRun:false}") Boolean dryRun,
+              ExecutorService executorService,
+              FateEngine fateEngine,
+              Infrastructure infrastructure,
+              Reporter reporter,
+              StateProvider stateProvider,
+              @Value("${schedule:0 0 * * * *}") String schedule,
+              TaskRepository taskRepository,
               TaskUriBuilder taskUriBuilder) {
         this.logger.info("Destruction schedule: {}", schedule);
+
+        this.dryRun = dryRun;
         this.executorService = executorService;
         this.fateEngine = fateEngine;
         this.infrastructure = infrastructure;
@@ -116,14 +125,19 @@ final class Destroyer {
                 if (this.fateEngine.shouldDie(member)) {
                     try {
                         this.logger.debug("{} Destroying: {}", identifier, member);
-                        this.infrastructure.destroy(member);
-                        this.logger.info("{} Destroyed: {}", identifier, member);
+
+                        if (this.dryRun) {
+                            this.logger.info("{} Destroyed (Dry Run): {}", identifier, member);
+                        } else {
+                            this.infrastructure.destroy(member);
+                            this.logger.info("{} Destroyed: {}", identifier, member);
+                        }
+
                         destroyedMembers.add(member);
                     } catch (DestructionException e) {
                         this.logger.warn("{} Destroy failed: {} ({})", identifier, member, e.getMessage());
                     }
                 }
-
             });
         }).forEach(future -> {
             try {

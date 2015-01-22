@@ -60,14 +60,14 @@ public final class DestroyerTest {
 
     private final TaskUriBuilder taskUriBuilder = mock(TaskUriBuilder.class);
 
-    private final Destroyer destroyer = new Destroyer(this.executorService, this.fateEngine, this.infrastructure,
+    private final Destroyer destroyer = new Destroyer(false, this.executorService, this.fateEngine, this.infrastructure,
             this.reporter, this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
 
     private final MockMvc mockMvc = standaloneSetup(this.destroyer).build();
 
-    private final Member member1 = new Member("test-id-1", "test-name-1", "test-group");
+    private final Member member1 = new Member("test-id-1", "test-deployment", "test-job", "test-name-1");
 
-    private final Member member2 = new Member("test-id-2", "test-name-2", "test-group");
+    private final Member member2 = new Member("test-id-2", "test-deployment", "test-job", "test-name-2");
 
     private final Set<Member> members = Stream.of(this.member1, this.member2).collect(Collectors.toSet());
 
@@ -93,6 +93,18 @@ public final class DestroyerTest {
         runRunnables();
 
         verify(this.infrastructure).destroy(this.member1);
+        verify(this.infrastructure, never()).destroy(this.member2);
+    }
+
+    @Test
+    public void destroyDryRun() throws DestructionException {
+        Destroyer destroyer = new Destroyer(true, this.executorService, this.fateEngine, this.infrastructure,
+                this.reporter, this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
+
+        destroyer.destroy();
+        runRunnables();
+
+        verify(this.infrastructure, never()).destroy(this.member1);
         verify(this.infrastructure, never()).destroy(this.member2);
     }
 

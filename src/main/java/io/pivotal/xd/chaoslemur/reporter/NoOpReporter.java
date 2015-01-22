@@ -13,7 +13,7 @@ final class NoOpReporter implements Reporter {
 
     @Override
     public void sendEvent(String title, String message) {
-        this.logger.debug("{}:\n{}", title, message);
+        this.logger.info("{}:\n{}", title, message);
     }
 
 }

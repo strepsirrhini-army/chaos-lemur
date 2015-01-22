@@ -11,7 +11,7 @@ import static org.junit.Assert.assertFalse;
 
 public final class SimpleInfrastructureTest {
 
-    private final Member member = new Member("test-id", "test-name", "test-group");
+    private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
 
     private final SimpleInfrastructure infrastructure = new SimpleInfrastructure();
 

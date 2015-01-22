@@ -16,23 +16,11 @@ public final class TaskTest {
     private final Task task = new Task(123L, Trigger.MANUAL);
 
     @Test
-    public void getId() {
-        assertTrue(this.task.getId().equals(123L));
-    }
-
-    @Test
-    public void getStatus() {
-        assertEquals(this.task.getStatus(), TaskStatus.IN_PROGRESS);
-    }
-
-    @Test
-    public void getStart() {
+    public void test() {
+        assertEquals((Long) 123L, this.task.getId());
+        assertEquals(TaskStatus.IN_PROGRESS, this.task.getStatus());
         assertTrue(this.task.getStart().isBefore(LocalDateTime.now().plusSeconds(5)));
-    }
-
-    @Test
-    public void getTrigger() {
-        assertTrue(this.task.getTrigger().equals(Trigger.MANUAL));
+        assertEquals(Trigger.MANUAL, this.task.getTrigger());
     }
 
     @Test

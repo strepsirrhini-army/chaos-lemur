@@ -16,16 +16,16 @@ import io.pivotal.xd.chaoslemur.Member;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.Set;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public final class AwsInfrastructureTest {
 
-    private final Member member = new Member("test-id", "test-name", "test-group");
+    private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
 
     private final AmazonEC2 amazonEC2 = mock(AmazonEC2.class);
 
@@ -33,9 +33,28 @@ public final class AwsInfrastructureTest {
 
     @Test
     public void getMembers() throws Exception {
-        when(this.amazonEC2.describeInstances(request())).thenReturn(result());
-        assertTrue(this.infrastructure.getMembers().toString().equals("[[id: test-id, name: test-name, " +
-                "group: test-group]]"));
+        when(this.amazonEC2.describeInstances(
+                        new DescribeInstancesRequest().withFilters(Arrays.asList(
+                                new Filter().withName("vpc-id").withValues("test-vpc"),
+                                new Filter().withName("tag-key").withValues("director"))))
+        ).thenReturn(
+                new DescribeInstancesResult().withReservations(Arrays.asList(
+                        new Reservation().withInstances(Arrays.asList(
+                                new Instance().withInstanceId("test-id").withTags(Arrays.asList(
+                                        new Tag("deployment", "test-deployment-857142ab878465bb9e7b"),
+                                        new Tag("job", "test-job-partition-us-east-1e"),
+                                        new Tag("Name", "test-name-partition-us-east-1e/1")))))))
+        );
+
+        Set<Member> members = this.infrastructure.getMembers();
+
+        assertEquals(1, members.size());
+
+        Member member = members.iterator().next();
+        assertEquals("test-id", member.getId());
+        assertEquals("test-deployment", member.getDeployment());
+        assertEquals("test-job", member.getJob());
+        assertEquals("test-name-partition-us-east-1e/1", member.getName());
     }
 
     @Test
@@ -48,30 +67,5 @@ public final class AwsInfrastructureTest {
         return new TerminateInstancesRequest().withInstanceIds(member.getId());
     }
 
-    private DescribeInstancesRequest request() {
-        return new DescribeInstancesRequest().withFilters(filters());
-    }
 
-    private Collection<Filter> filters() {
-        return Arrays.asList(
-                new Filter().withName("vpc-id").withValues("test-vpc"),
-                new Filter().withName("tag-key").withValues("director"));
-    }
-
-    private DescribeInstancesResult result() {
-        return new DescribeInstancesResult().withReservations(reservations());
-    }
-
-    private Collection<Reservation> reservations() {
-        return Arrays.asList(new Reservation().withInstances(instances()));
-    }
-
-    private Collection<Instance> instances() {
-        return Arrays.asList(new Instance().withInstanceId("test-id").withTags(tags()));
-    }
-
-
-    private Collection<Tag> tags() {
-        return Arrays.asList(new Tag("Name", "test-name"), new Tag("job", "test-group"));
-    }
 }

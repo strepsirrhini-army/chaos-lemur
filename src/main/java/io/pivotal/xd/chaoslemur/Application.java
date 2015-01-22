@@ -7,9 +7,8 @@ package io.pivotal.xd.chaoslemur;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 import org.springframework.web.client.RestTemplate;
@@ -20,10 +19,9 @@ import java.util.Random;
 /**
  * Main entry point and configuration class
  */
-@ComponentScan
-@EnableAutoConfiguration
+@SpringBootApplication
 @EnableScheduling
-public class ApplicationConfiguration {
+public class Application {
 
     /**
      * Start method
@@ -32,7 +30,7 @@ public class ApplicationConfiguration {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        SpringApplication.run(ApplicationConfiguration.class, args);
+        SpringApplication.run(Application.class, args);
     }
 
     @Bean

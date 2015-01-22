@@ -16,50 +16,48 @@ import static org.mockito.Mockito.when;
 
 public final class RandomFateEngineTest {
 
-    private final String[] blacklist = new String[]{"test-group-1", "test-group-2"};
+    private final String[] blacklist = new String[]{"test-deployment-1", "test-job-1"};
 
     private final MockEnvironment environment = new MockEnvironment();
 
+    private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
+
     private final Random random = mock(Random.class);
 
-    private final RandomFateEngine fateEngine = new RandomFateEngine(this.blacklist, 0.3f, this.environment,
+    private final RandomFateEngine fateEngine = new RandomFateEngine(this.blacklist, 0.5f, this.environment,
             this.random);
 
     @Test
-    public void killDefault() {
-        Member member = new Member("test-id", "test-name", "test-group");
-
-        when(this.random.nextFloat()).thenReturn(0.2f);
-        assertTrue(fateEngine.shouldDie(member));
-
-    }
-
-    @Test
-    public void saveDefault() {
-        Member member = new Member("test-id", "test-name", "test-group");
-
-        when(this.random.nextFloat()).thenReturn(0.5f);
-        assertFalse(fateEngine.shouldDie(member));
-
-    }
-
-    @Test
-    public void killNonDefault() {
-        this.environment.setProperty("test-group.probability", "0.7");
-        Member member = new Member("test-id", "test-name", "test-group");
-
-        when(this.random.nextFloat()).thenReturn(0.4f);
-        assertTrue(fateEngine.shouldDie(member));
-
-    }
-
-    @Test
     public void blacklist() {
-        Member member = new Member("test-id-1", "test-name-1", "test-group-1");
-
         when(this.random.nextFloat()).thenReturn(0.0f);
-        assertFalse(fateEngine.shouldDie(member));
 
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
+
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
+    }
+
+    @Test
+    public void jobPrecedence() {
+        when(this.random.nextFloat()).thenReturn(0.5f);
+        this.environment.setProperty("test-job.probability", "1.0");
+
+        assertTrue(this.fateEngine.shouldDie(this.member));
+    }
+
+    @Test
+    public void deploymentPrecedence() {
+        when(this.random.nextFloat()).thenReturn(0.5f);
+        this.environment.setProperty("test-deployment.probability", "1.0");
+
+        assertTrue(this.fateEngine.shouldDie(this.member));
+    }
+
+    @Test
+    public void defaultPrecedence() {
+        when(this.random.nextFloat()).thenReturn(0.4f);
+
+        assertTrue(this.fateEngine.shouldDie(this.member));
     }
 
 }

@@ -7,23 +7,29 @@ package io.pivotal.xd.chaoslemur;
 /**
  * Represents a running instance
  */
-public final class Member implements Comparable<Member>{
+public final class Member implements Comparable<Member> {
 
     private final String id;
 
+    private final String deployment;
+
     private final String name;
 
-    private final String group;
+    private final String job;
 
     /**
      * Creates an instance
      *
-     * @param group the group the {@link Member} belongs to
+     * @param id         the ID of the {@link Member}
+     * @param deployment the deployment the {@link Member} belongs to
+     * @param job        the job the {@link Member} belongs to
+     * @param name       the name of the {@link Member}
      */
-    public Member(String id, String name, String group) {
+    public Member(String id, String deployment, String job, String name) {
         this.id = id;
+        this.deployment = deployment;
+        this.job = job;
         this.name = name;
-        this.group = group;
     }
 
     /**
@@ -36,21 +42,30 @@ public final class Member implements Comparable<Member>{
     }
 
     /**
+     * Returns the deployment the {@link Member} belongs to
+     *
+     * @return the deployment the {@link Member} belongs to
+     */
+    public String getDeployment() {
+        return this.deployment;
+    }
+
+    /**
+     * Returns the job the {@link Member} belongs to
+     *
+     * @return the job the {@link Member} belongs to
+     */
+    public String getJob() {
+        return this.job;
+    }
+
+    /**
      * Returns the name of the {@link Member}
      *
      * @return the name of the {@link Member}
      */
     public String getName() {
         return this.name;
-    }
-
-    /**
-     * Returns the group the {@link Member} belongs to
-     *
-     * @return the group the {@link Member} belongs to
-     */
-    public String getGroup() {
-        return this.group;
     }
 
     @Override
@@ -60,6 +75,7 @@ public final class Member implements Comparable<Member>{
 
     @Override
     public String toString() {
-        return String.format("[id: %s, name: %s, group: %s]", this.id, this.name, this.group);
+        return String.format("[id: %s, deployment: %s, job: %s, name: %s]", this.id, this.deployment, this.job, this
+                .name);
     }
 }

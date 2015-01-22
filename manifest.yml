@@ -5,5 +5,3 @@ applications:
   instances: 1
   path: target/chaos-lemur.jar
   buildpack: https://github.com/cloudfoundry/java-buildpack.git
-  services:
-    - chaos-lemur-persistence

@@ -10,7 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -30,9 +30,9 @@ public final class TaskManagerTest {
 
     @Test
     public void create() {
-        assertTrue(this.task1.getTrigger().equals(Trigger.MANUAL));
-        assertTrue(this.task2.getTrigger().equals(Trigger.SCHEDULED));
-        assertTrue(this.task2.getId() == this.task1.getId() + 1);
+        assertEquals(Trigger.MANUAL, this.task1.getTrigger());
+        assertEquals(Trigger.SCHEDULED, this.task2.getTrigger());
+        assertEquals(this.task1.getId() + 1, (long) this.task2.getId());
     }
 
     @Test

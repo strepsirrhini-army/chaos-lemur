@@ -46,15 +46,25 @@ final class RandomFateEngine implements FateEngine {
             return false;
         }
 
-        Float probability = Float.parseFloat(this.environment.getProperty(getKey(member), this.defaultProbability));
+        Float probability = new Precedence<String>()
+                .candidate(() -> getProbability(member.getJob()))
+                .candidate(() -> getProbability(member.getDeployment()))
+                .candidate(this.defaultProbability)
+                .get(Float::parseFloat);
+
         return this.random.nextFloat() < probability;
     }
 
     private boolean isBlacklisted(Member member) {
-        return Arrays.stream(this.blacklist).anyMatch(member.getGroup()::equalsIgnoreCase);
+        return Arrays.stream(this.blacklist)
+                .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
     }
 
-    private String getKey(Member member) {
-        return String.format("%s.probability", member.getGroup());
+    private String getProbability(String name) {
+        return this.environment.getProperty(getProbabilityKey(name));
+    }
+
+    private String getProbabilityKey(String name) {
+        return String.format("%s.probability", name);
     }
 }
