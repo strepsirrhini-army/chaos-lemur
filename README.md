@@ -70,9 +70,9 @@ The project is set up as a Maven project and doesn't have any special requiremen
 
 
 ## License
+The project is released under version 2.0 of the [Apache License][a].
 
-Copyright 2014 Pivotal Software, Inc. All Rights Reserved.
-
+[a]: http://www.apache.org/licenses/LICENSE-2.0
 [r]: http://docs.run.pivotal.io/marketplace/services/rediscloud.html
 [c]: https://console.run.pivotal.io/register
 [d]: https://www.datadoghq.com
