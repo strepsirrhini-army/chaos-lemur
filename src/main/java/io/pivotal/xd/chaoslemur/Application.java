@@ -58,7 +58,7 @@ public class Application {
     @Bean(destroyMethod = "shutdown")
     ThreadPoolExecutorFactoryBean executor() {
         ThreadPoolExecutorFactoryBean factoryBean = new ThreadPoolExecutorFactoryBean();
-        factoryBean.setQueueCapacity(0);
+        factoryBean.setQueueCapacity(5);
         factoryBean.setCorePoolSize(5);
         factoryBean.setMaxPoolSize(20);
         factoryBean.setThreadNamePrefix("destroyer-");
@@ -68,8 +68,7 @@ public class Application {
 
     @Bean
     ObjectMapper objectMapper() {
-        return new ObjectMapper()
-                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        return new ObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
 }

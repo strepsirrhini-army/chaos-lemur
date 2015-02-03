@@ -20,16 +20,21 @@ Since the application is designed to work in a PaaS environment, all configurati
 
 | Key | Description
 | --- | -----------
-| `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs. If this value is not set Chaos Lemur will use an internal destroyer for test purposes.
+| `<DEPLOYMENT | JOB>_PROBABILITY` | The probability for a given deployment or job, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the `redis` job will be destroyed more often than a default VM.
+| `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
-| `AWS_VPCID` | The Virtual Private Cloud ID that your VMs are running in. Available from the EC2 Management Console.
 | `BLACKLIST` | A comma delimited list of deployments and jobs. Any member of the deployment or job will be excluded from destruction. Default is blank, i.e. all members of all deployments and jobs are eligible for destruction.
 | `DATADOG_APIKEY` | Allows Chaos Lemur to log destruction events to [DataDog][d]. If this value is not set Chaos Lemur will redirect the output to the logger at `INFO` level.
 | `DATADOG_APPKEY` | Used with the `DATADOG_APIKEY` to give DataDog access.
 | `DEFAULT_PROBABILITY` | The default probability for a VM to be destroyed, ranging from `0.0` (will never be destroyed) to `1.0` (will always be destroyed). The probability is per run, with each run independent of any other. Default is `0.2`.
-| `<DEPLOYMENT | JOB>_PROBABILITY` | The probability for a given deployment or job, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the `redis` job will be destroyed more often than a default VM.
+| `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
+| `DIRECTOR_PASSWORD` | Used with `DIRECTOR_HOST` to give BOSH Director access.
+| `DIRECTOR_USERNAME` | Used with `DIRECTOR_HOST` to give BOSH Director access.
 | `DRYRUN` | Causes Chaos Lemur omit the _actual_ destruction of VMs, but work properly in all other respects.  The default is `false`.
 | `SCHEDULE` | The schedule to trigger a run of Chaos Lemur. Defined using Spring cron syntax, so `0 0/10 * * * *` would run every 10 minutes. Default is  `0 0 * * * *` (once per hour, on the hour).
+| `VSPHERE_HOST` | The vSphere host to used to destroy VMs.
+| `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
+| `VSPHERE_USERNAME` | Used with `VSPHERE_HOST` to give vSphere access.
 
 
 ### Services

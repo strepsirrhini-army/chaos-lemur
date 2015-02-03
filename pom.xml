@@ -35,9 +35,10 @@
     <packaging>jar</packaging>
 
     <properties>
-        <aws.version>1.9.14</aws.version>
+        <aws.version>1.9.17</aws.version>
         <evo-inflector.version>1.2.1</evo-inflector.version>
         <java.version>1.8</java.version>
+        <vijava.version>5.1</vijava.version>
     </properties>
 
     <dependencies>
@@ -51,13 +52,18 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.jayway.jsonpath</groupId>
+            <artifactId>json-path</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>vijava</artifactId>
+            <version>${vijava.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.atteo</groupId>
             <artifactId>evo-inflector</artifactId>
             <version>${evo-inflector.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.jayway.jsonpath</groupId>
-            <artifactId>json-path</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -75,10 +81,6 @@
         <dependency>
             <groupId>org.springframework.hateoas</groupId>
             <artifactId>spring-hateoas</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
         </dependency>
         <dependency>
             <groupId>redis.clients</groupId>
