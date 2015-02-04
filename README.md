@@ -26,6 +26,7 @@ Since the application is designed to work in a PaaS environment, all configurati
 | `BLACKLIST` | A comma delimited list of deployments and jobs. Any member of the deployment or job will be excluded from destruction. Default is blank, i.e. all members of all deployments and jobs are eligible for destruction.
 | `DATADOG_APIKEY` | Allows Chaos Lemur to log destruction events to [DataDog][d]. If this value is not set Chaos Lemur will redirect the output to the logger at `INFO` level.
 | `DATADOG_APPKEY` | Used with the `DATADOG_APIKEY` to give DataDog access.
+| `DATADOG_TAGS` | A set of tags to attach to each DataDog event.
 | `DEFAULT_PROBABILITY` | The default probability for a VM to be destroyed, ranging from `0.0` (will never be destroyed) to `1.0` (will always be destroyed). The probability is per run, with each run independent of any other. Default is `0.2`.
 | `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
 | `DIRECTOR_PASSWORD` | Used with `DIRECTOR_HOST` to give BOSH Director access.
