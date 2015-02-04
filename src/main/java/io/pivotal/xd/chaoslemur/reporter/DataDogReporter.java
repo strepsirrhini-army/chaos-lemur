@@ -18,7 +18,6 @@ package io.pivotal.xd.chaoslemur.reporter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,25 +28,30 @@ final class DataDogReporter implements Reporter {
 
     private static final String URI = "https://app.datadoghq.com/" +
             "api/v1/events?api_key={apiKey}&application_key={appKey}";
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final String apiKey;
 
     private final String appKey;
 
     private final RestTemplate restTemplate;
 
-    DataDogReporter(@Value("${dataDog.apiKey}") String apiKey, @Value("${dataDog.appKey}") String appKey,
-                    RestTemplate restTemplate) {
+    private final String[] tags;
+
+    DataDogReporter(String apiKey, String appKey, RestTemplate restTemplate, String[] tags) {
         this.apiKey = apiKey;
         this.appKey = appKey;
         this.restTemplate = restTemplate;
+        this.tags = tags;
     }
 
     @Override
     public void sendEvent(String title, String message) {
-        Map<String, String> payload = new HashMap<>();
+        Map<String, Object> payload = new HashMap<>();
         payload.put("title", title);
         payload.put("text", message);
+        payload.put("tags", this.tags);
 
         try {
             this.restTemplate.postForEntity(URI, payload, Void.class, this.apiKey, this.appKey);

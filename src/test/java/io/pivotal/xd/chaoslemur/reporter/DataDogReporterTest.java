@@ -38,7 +38,7 @@ public final class DataDogReporterTest {
     public void setup() {
         RestTemplate restTemplate = new RestTemplate();
         this.mockServer = MockRestServiceServer.createServer(restTemplate);
-        this.dataDog = new DataDogReporter("apiKey", "appKey", restTemplate);
+        this.dataDog = new DataDogReporter("apiKey", "appKey", restTemplate, new String[]{"key:value"});
     }
 
     @Test
