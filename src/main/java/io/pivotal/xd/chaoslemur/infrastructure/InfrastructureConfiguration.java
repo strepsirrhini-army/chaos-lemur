@@ -19,12 +19,17 @@ package io.pivotal.xd.chaoslemur.infrastructure;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+import com.vmware.vim25.mo.InventoryNavigator;
+import com.vmware.vim25.mo.ServiceInstance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+import java.net.URL;
 
 @Configuration
 class InfrastructureConfiguration {
@@ -38,8 +43,25 @@ class InfrastructureConfiguration {
 
     @Bean
     @ConditionalOnBean(AmazonEC2.class)
-    Infrastructure awsInfrastructure(AmazonEC2 amazonEC2, @Value("${aws.vpcId}") String vpcId) {
-        return new AwsInfrastructure(amazonEC2, vpcId);
+    Infrastructure awsInfrastructure(StandardDirectorUtils directorUtils, AmazonEC2 amazonEC2) {
+        return new AwsInfrastructure(directorUtils, amazonEC2);
+    }
+
+    @Bean
+    @ConditionalOnProperty("vsphere.host")
+    InventoryNavigator serviceInstance(@Value("${vsphere.host}") String host,
+                                       @Value("${vsphere.username}") String username,
+                                       @Value("${vsphere.password}") String password) throws IOException {
+
+        ServiceInstance serviceInstance = new ServiceInstance(new URL(String.format("https://%s/sdk", host)),
+                username, password, true);
+        return new InventoryNavigator(serviceInstance.getRootFolder());
+    }
+
+    @Bean
+    @ConditionalOnBean(InventoryNavigator.class)
+    Infrastructure vSphereInfrastructure(InventoryNavigator inventoryNavigator, StandardDirectorUtils directorUtils) {
+        return new VSphereInfrastructure(directorUtils, inventoryNavigator);
     }
 
     @Bean

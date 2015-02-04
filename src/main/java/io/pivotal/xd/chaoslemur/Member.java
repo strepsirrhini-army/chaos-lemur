@@ -81,6 +81,23 @@ public final class Member implements Comparable<Member> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Member member = (Member) o;
+
+        if (name != null ? !name.equals(member.name) : member.name != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
+
+    @Override
     public int compareTo(Member member) {
         return this.name.compareTo(member.getName());
     }

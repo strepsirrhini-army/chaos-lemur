@@ -17,23 +17,12 @@
 package io.pivotal.xd.chaoslemur.infrastructure;
 
 import com.amazonaws.services.ec2.AmazonEC2;
-import com.amazonaws.services.ec2.model.DescribeInstancesRequest;
-import com.amazonaws.services.ec2.model.DescribeInstancesResult;
-import com.amazonaws.services.ec2.model.Filter;
-import com.amazonaws.services.ec2.model.Instance;
-import com.amazonaws.services.ec2.model.Reservation;
-import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 import io.pivotal.xd.chaoslemur.Member;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public final class AwsInfrastructureTest {
 
@@ -41,33 +30,9 @@ public final class AwsInfrastructureTest {
 
     private final AmazonEC2 amazonEC2 = mock(AmazonEC2.class);
 
-    private final AwsInfrastructure infrastructure = new AwsInfrastructure(this.amazonEC2, "test-vpc");
+    private final DirectorUtils directorUtils = mock(DirectorUtils.class);
 
-    @Test
-    public void getMembers() throws Exception {
-        when(this.amazonEC2.describeInstances(
-                        new DescribeInstancesRequest().withFilters(Arrays.asList(
-                                new Filter().withName("vpc-id").withValues("test-vpc"),
-                                new Filter().withName("tag-key").withValues("director"))))
-        ).thenReturn(
-                new DescribeInstancesResult().withReservations(Arrays.asList(
-                        new Reservation().withInstances(Arrays.asList(
-                                new Instance().withInstanceId("test-id").withTags(Arrays.asList(
-                                        new Tag("deployment", "test-deployment-857142ab878465bb9e7b"),
-                                        new Tag("job", "test-job-partition-us-east-1e"),
-                                        new Tag("Name", "test-name-partition-us-east-1e/1")))))))
-        );
-
-        Set<Member> members = this.infrastructure.getMembers();
-
-        assertEquals(1, members.size());
-
-        Member member = members.iterator().next();
-        assertEquals("test-id", member.getId());
-        assertEquals("test-deployment", member.getDeployment());
-        assertEquals("test-job", member.getJob());
-        assertEquals("test-name-partition-us-east-1e/1", member.getName());
-    }
+    private final AwsInfrastructure infrastructure = new AwsInfrastructure(this.directorUtils, this.amazonEC2);
 
     @Test
     public void destroy() throws Exception {
@@ -76,7 +41,7 @@ public final class AwsInfrastructureTest {
     }
 
     private TerminateInstancesRequest terminateInstancesRequest() {
-        return new TerminateInstancesRequest().withInstanceIds(member.getId());
+        return new TerminateInstancesRequest().withInstanceIds(this.member.getId());
     }
 
 
