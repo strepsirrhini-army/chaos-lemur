@@ -61,7 +61,6 @@ public final class VSphereInfrastructureTest {
         this.infrastructure.destroy(this.member);
 
         verify(this.virtualMachine).powerOffVM_Task();
-        verify(this.virtualMachine).destroy_Task();
     }
 
     @Test(expected = DestructionException.class)

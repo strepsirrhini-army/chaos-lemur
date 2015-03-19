@@ -41,7 +41,6 @@ final class VSphereInfrastructure extends AbstractDirectorUtilsInfrastructure {
                     .searchManagedEntity("VirtualMachine", member.getId());
 
             handleTask(virtualMachine.powerOffVM_Task());
-            handleTask(virtualMachine.destroy_Task());
         } catch (InterruptedException | RemoteException e) {
             throw new DestructionException(String.format("Unable to destroy %s", member), e);
         }
