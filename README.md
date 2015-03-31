@@ -1,11 +1,11 @@
 # Chaos Lemur
-This project is a self-hostable application to randomly destroy virtual machines in a BOSH-managed environment, as an aid to resilience testing of high-availability. Its main features are:
+This project is a self-hostable application to randomly destroy virtual machines in a BOSH-managed environment, as an aid to resilience testing of high-availability systems. Its main features are:
 
 * Triggers on a user-defined schedule, selecting 0 or more VMs to destroy at random during each run.
 * Manual triggering of unscheduled destroys.
 * Per-deployment and per-job probabilities for destruction of member VMs.
 * Optional blacklisting of deployments and jobs to protect their members from destruction.
-* Runs against different types IaaS (e.g. AWS, vSphere) using a small infrastructure API.
+* Runs against different types of IaaS (e.g. AWS, vSphere) using a small infrastructure API.
 * Optionally records activities to [DataDog][d].
 
 Although Chaos Lemur recognizes deployments and jobs, it is not possible to select an entire deployment or job for destruction. Entire deployments and jobs will be destroyed over time by chance, given sufficient runs.
@@ -31,7 +31,7 @@ Since the application is designed to work in a PaaS environment, all configurati
 | `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
 | `DIRECTOR_PASSWORD` | Used with `DIRECTOR_HOST` to give BOSH Director access.
 | `DIRECTOR_USERNAME` | Used with `DIRECTOR_HOST` to give BOSH Director access.
-| `DRYRUN` | Causes Chaos Lemur omit the _actual_ destruction of VMs, but work properly in all other respects.  The default is `false`.
+| `DRYRUN` | Causes Chaos Lemur to omit the _actual_ destruction of VMs, but work properly in all other respects.  The default is `false`.
 | `SCHEDULE` | The schedule to trigger a run of Chaos Lemur. Defined using Spring cron syntax, so `0 0/10 * * * *` would run every 10 minutes. Default is  `0 0 * * * *` (once per hour, on the hour).
 | `VSPHERE_HOST` | The vSphere host to used to destroy VMs.
 | `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
