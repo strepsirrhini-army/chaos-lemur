@@ -23,7 +23,6 @@ import com.vmware.vim25.mo.InventoryNavigator;
 import com.vmware.vim25.mo.ServiceInstance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -65,7 +64,7 @@ class InfrastructureConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(Infrastructure.class)
+    @ConditionalOnProperty("simple.infrastructure")
     Infrastructure simpleInfrastructure() {
         return new SimpleInfrastructure();
     }
