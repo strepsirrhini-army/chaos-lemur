@@ -16,7 +16,7 @@ Although Chaos Lemur recognizes deployments and jobs, it is not possible to sele
 The application is written in Java 8 and packaged as a self executable JAR file. This enables it to run anywhere that Java is available. Building the application (required for deployment) requires [Maven][m].
 
 ### Environment Variables
-Since the application is designed to work in a PaaS environment, all configuration is done with environment variables.
+Since the application is designed to work in a PaaS environment, all configuration is done with environment variables. Chaos Lemur requires an infrastructure to be configured, so you must set either the AWS, VSPHERE, or SIMPLE_INFRASTRUCTURE values.
 
 | Key | Description
 | --- | -----------
@@ -33,7 +33,8 @@ Since the application is designed to work in a PaaS environment, all configurati
 | `DIRECTOR_USERNAME` | Used with `DIRECTOR_HOST` to give BOSH Director access.
 | `DRYRUN` | Causes Chaos Lemur to omit the _actual_ destruction of VMs, but work properly in all other respects.  The default is `false`.
 | `SCHEDULE` | The schedule to trigger a run of Chaos Lemur. Defined using Spring cron syntax, so `0 0/10 * * * *` would run every 10 minutes. Default is  `0 0 * * * *` (once per hour, on the hour).
-| `VSPHERE_HOST` | The vSphere host to used to destroy VMs.
+| `SIMPLE_INFRASTRUCTURE` | Chaos Lemur will use its built-in infrastructure rather than AWS or vSphere. Useful for testing. The value for the variable is not read, but something is required for Cloud Foundry (e.g. 'true').
+| `VSPHERE_HOST` | The vSphere host used to destroy VMs.
 | `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
 | `VSPHERE_USERNAME` | Used with `VSPHERE_HOST` to give vSphere access.
 
