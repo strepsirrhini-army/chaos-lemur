@@ -25,6 +25,7 @@ import com.vmware.vim25.mo.VirtualMachine;
 import io.pivotal.xd.chaoslemur.Member;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 import static org.mockito.Mockito.mock;
@@ -41,6 +42,8 @@ public final class VSphereInfrastructureTest {
 
     private final InventoryNavigator inventoryNavigator = mock(InventoryNavigator.class);
 
+    private final InventoryNavigatorFactory inventoryNavigatorFactory = mock(InventoryNavigatorFactory.class);
+
     private final Task task = mock(Task.class);
 
     private final TaskInfo taskInfo = mock(TaskInfo.class);
@@ -48,10 +51,11 @@ public final class VSphereInfrastructureTest {
     private final LocalizedMethodFault localizedMethodFault = mock(LocalizedMethodFault.class);
 
     private final VSphereInfrastructure infrastructure = new VSphereInfrastructure(this.directorUtils, this
-            .inventoryNavigator);
+            .inventoryNavigatorFactory);
 
     @Test
-    public void destroy() throws DestructionException, RemoteException {
+    public void destroy() throws DestructionException, IOException {
+        when(this.inventoryNavigatorFactory.create()).thenReturn(this.inventoryNavigator);
         when(this.inventoryNavigator.searchManagedEntity("VirtualMachine", "test-id")).thenReturn(this.virtualMachine);
         when(this.virtualMachine.powerOffVM_Task()).thenReturn(this.task);
         when(this.virtualMachine.destroy_Task()).thenReturn(this.task);
@@ -64,7 +68,8 @@ public final class VSphereInfrastructureTest {
     }
 
     @Test(expected = DestructionException.class)
-    public void taskFailure() throws RemoteException, DestructionException {
+    public void taskFailure() throws DestructionException, IOException {
+        when(this.inventoryNavigatorFactory.create()).thenReturn(this.inventoryNavigator);
         when(this.inventoryNavigator.searchManagedEntity("VirtualMachine", "test-id")).thenReturn(this.virtualMachine);
         when(this.virtualMachine.powerOffVM_Task()).thenReturn(this.task);
         when(this.task.getTaskInfo()).thenReturn(this.taskInfo);

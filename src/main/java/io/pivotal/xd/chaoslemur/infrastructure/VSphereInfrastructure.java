@@ -24,27 +24,28 @@ import com.vmware.vim25.mo.VirtualMachine;
 import io.pivotal.xd.chaoslemur.Member;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 
 final class VSphereInfrastructure extends AbstractDirectorUtilsInfrastructure {
 
-    private final InventoryNavigator inventoryNavigator;
+    private final InventoryNavigatorFactory inventoryNavigatorFactory;
 
-    VSphereInfrastructure(DirectorUtils directorUtils, InventoryNavigator inventoryNavigator) {
+    VSphereInfrastructure(DirectorUtils directorUtils, InventoryNavigatorFactory inventoryNavigatorFactory) {
         super(directorUtils);
-        this.inventoryNavigator = inventoryNavigator;
+        this.inventoryNavigatorFactory = inventoryNavigatorFactory;
     }
 
     @Override
     public void destroy(Member member) throws DestructionException {
         try {
-            VirtualMachine virtualMachine = (VirtualMachine) this.inventoryNavigator
+            VirtualMachine virtualMachine = (VirtualMachine) this.inventoryNavigatorFactory.create()
                     .searchManagedEntity("VirtualMachine", member.getId());
 
             Assert.notNull(virtualMachine, String.format("virtualMachine must not be null for %s", member));
 
             handleTask(virtualMachine.powerOffVM_Task());
-        } catch (InterruptedException | RemoteException e) {
+        } catch (InterruptedException | IOException e) {
             throw new DestructionException(String.format("Unable to destroy %s", member), e);
         }
     }

@@ -20,15 +20,13 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.vmware.vim25.mo.InventoryNavigator;
-import com.vmware.vim25.mo.ServiceInstance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.io.IOException;
-import java.net.URL;
+import java.net.MalformedURLException;
 
 @Configuration
 class InfrastructureConfiguration {
@@ -48,19 +46,19 @@ class InfrastructureConfiguration {
 
     @Bean
     @ConditionalOnProperty("vsphere.host")
-    InventoryNavigator serviceInstance(@Value("${vsphere.host}") String host,
-                                       @Value("${vsphere.username}") String username,
-                                       @Value("${vsphere.password}") String password) throws IOException {
+    InventoryNavigatorFactory inventoryNavigatorFactory(@Value("${vsphere.host}") String host,
+                                                        @Value("${vsphere.username}") String username,
+                                                        @Value("${vsphere.password}") String password)
+            throws MalformedURLException {
 
-        ServiceInstance serviceInstance = new ServiceInstance(new URL(String.format("https://%s/sdk", host)),
-                username, password, true);
-        return new InventoryNavigator(serviceInstance.getRootFolder());
+        return new StandardInventoryNavigatorFactory(host, username, password);
     }
 
     @Bean
-    @ConditionalOnBean(InventoryNavigator.class)
-    Infrastructure vSphereInfrastructure(InventoryNavigator inventoryNavigator, StandardDirectorUtils directorUtils) {
-        return new VSphereInfrastructure(directorUtils, inventoryNavigator);
+    @ConditionalOnBean(InventoryNavigatorFactory.class)
+    Infrastructure vSphereInfrastructure(InventoryNavigatorFactory inventoryNavigatorFactory,
+                                         StandardDirectorUtils directorUtils) {
+        return new VSphereInfrastructure(directorUtils, inventoryNavigatorFactory);
     }
 
     @Bean

@@ -16,23 +16,16 @@
 
 package io.pivotal.xd.chaoslemur.infrastructure;
 
-import java.util.Map;
-import java.util.Set;
+import com.vmware.vim25.mo.InventoryNavigator;
 
-interface DirectorUtils {
+import java.io.IOException;
 
-    /**
-     * Returns a list of deployments on the Director
-     *
-     * @return a list of deployments on the Director
-     */
-    Set<String> getDeployments();
+interface InventoryNavigatorFactory {
 
     /**
-     * Returns a list of VMs in a deployment
+     * Creates a new {@link InventoryNavigator} on each invocation
      *
-     * @param deployment the deployment
-     * @return a list of VMs in a deployment
+     * @return a new {@link InventoryNavigator}
      */
-    Set<Map<String, String>> getVirtualMachines(String deployment);
+    InventoryNavigator create() throws IOException;
 }
