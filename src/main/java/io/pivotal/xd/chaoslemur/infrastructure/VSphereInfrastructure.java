@@ -22,6 +22,7 @@ import com.vmware.vim25.mo.InventoryNavigator;
 import com.vmware.vim25.mo.Task;
 import com.vmware.vim25.mo.VirtualMachine;
 import io.pivotal.xd.chaoslemur.Member;
+import org.springframework.util.Assert;
 
 import java.rmi.RemoteException;
 
@@ -39,6 +40,8 @@ final class VSphereInfrastructure extends AbstractDirectorUtilsInfrastructure {
         try {
             VirtualMachine virtualMachine = (VirtualMachine) this.inventoryNavigator
                     .searchManagedEntity("VirtualMachine", member.getId());
+
+            Assert.notNull(virtualMachine, String.format("virtualMachine must not be null for %s", member));
 
             handleTask(virtualMachine.powerOffVM_Task());
         } catch (InterruptedException | RemoteException e) {

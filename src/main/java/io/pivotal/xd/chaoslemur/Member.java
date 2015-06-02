@@ -16,6 +16,8 @@
 
 package io.pivotal.xd.chaoslemur;
 
+import org.springframework.util.Assert;
+
 /**
  * Represents a running instance
  */
@@ -38,6 +40,11 @@ public final class Member implements Comparable<Member> {
      * @param name       the name of the {@link Member}
      */
     public Member(String id, String deployment, String job, String name) {
+        Assert.hasText(id, "id must have text");
+        Assert.hasText(deployment, "deployment must have text");
+        Assert.hasText(job, "job must have text");
+        Assert.hasText(name, "name must have text");
+
         this.id = id;
         this.deployment = deployment;
         this.job = job;
