@@ -87,7 +87,7 @@ final class RedisStateProvider extends AbstractRestControllerStateProvider {
                 try {
                     this.jedisPool.returnBrokenResource(jedis);
                 } catch (RuntimeException e) {
-                    this.logger.warn("Exception encountered when returning broken Jedis resource", e);
+                    this.logger.warn("Failed to return broken Jedis resource", e);
                 }
             }
         }
@@ -97,7 +97,7 @@ final class RedisStateProvider extends AbstractRestControllerStateProvider {
                 try {
                     this.jedisPool.returnResource(jedis);
                 } catch (RuntimeException e) {
-                    this.logger.warn("Exception encountered when returning Jedis resource", e);
+                    this.logger.warn("Failed to return Jedis resource", e);
                 }
             }
         }

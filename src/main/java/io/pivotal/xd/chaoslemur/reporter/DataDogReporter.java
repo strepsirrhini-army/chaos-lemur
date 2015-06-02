@@ -56,7 +56,7 @@ final class DataDogReporter implements Reporter {
         try {
             this.restTemplate.postForEntity(URI, payload, Void.class, this.apiKey, this.appKey);
         } catch (HttpClientErrorException e) {
-            this.logger.error(e.getResponseBodyAsString());
+            this.logger.warn(e.getResponseBodyAsString());
         }
     }
 }

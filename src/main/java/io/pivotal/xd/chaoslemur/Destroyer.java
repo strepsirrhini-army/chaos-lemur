@@ -147,7 +147,7 @@ final class Destroyer {
 
                         destroyedMembers.add(member);
                     } catch (DestructionException e) {
-                        this.logger.warn("{} Destroy failed: {} ({})", identifier, member, e.getMessage());
+                        this.logger.warn("{} Destroy failed: {}", identifier, member, e);
                     }
                 }
             });
@@ -155,7 +155,7 @@ final class Destroyer {
             try {
                 future.get();
             } catch (InterruptedException | ExecutionException e) {
-                this.logger.error(e.getMessage());
+                this.logger.warn("{} Failed to destroy member", identifier, e);
             }
         });
 
