@@ -33,6 +33,8 @@ final class RandomFateEngine implements FateEngine {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final String[] blacklist;
+    
+    private final String[] whitelist;
 
     private final String defaultProbability;
 
@@ -41,20 +43,22 @@ final class RandomFateEngine implements FateEngine {
     private final Random random;
 
     @Autowired
-    RandomFateEngine(@Value("${blacklist:}") String[] blacklist, @Value("${default.probability:0.2}") Float
-            defaultProbability, Environment environment, Random random) {
+    RandomFateEngine(@Value("${blacklist:}") String[] blacklist, @Value("${whitelist:}") String[] whitelist,
+            @Value("${default.probability:0.2}") Float defaultProbability, Environment environment, Random random) {
         this.blacklist = blacklist;
+        this.whitelist = whitelist;
         this.defaultProbability = defaultProbability.toString();
         this.environment = environment;
         this.random = random;
 
         this.logger.info("Blacklist: {}", StringUtils.arrayToCommaDelimitedString(blacklist));
+        this.logger.info("Whitelist: {}", StringUtils.arrayToCommaDelimitedString(whitelist));
         this.logger.info("Default probability: {}", defaultProbability);
     }
 
     @Override
     public Boolean shouldDie(Member member) {
-        if (isBlacklisted(member)) {
+        if (!isWhitelisted(member) || isBlacklisted(member)) {
             return false;
         }
 
@@ -65,6 +69,14 @@ final class RandomFateEngine implements FateEngine {
                 .get(Float::parseFloat);
 
         return this.random.nextFloat() < probability;
+    }
+
+    private boolean isWhitelisted(Member member) {
+        if(this.whitelist.length == 0){
+            return true;
+        }
+        return Arrays.stream(this.whitelist)
+                .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
     }
 
     private boolean isBlacklisted(Member member) {
