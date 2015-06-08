@@ -29,6 +29,8 @@ import static org.mockito.Mockito.when;
 public final class RandomFateEngineTest {
 
     private final String[] blacklist = new String[]{"test-deployment-1", "test-job-1"};
+    
+    private final String[] whitelist = new String[0];
 
     private final MockEnvironment environment = new MockEnvironment();
 
@@ -36,17 +38,72 @@ public final class RandomFateEngineTest {
 
     private final Random random = mock(Random.class);
 
-    private final RandomFateEngine fateEngine = new RandomFateEngine(this.blacklist, 0.5f, this.environment,
+    private RandomFateEngine fateEngine = new RandomFateEngine(this.blacklist, this.whitelist, 0.5f, this.environment,
             this.random);
-
+    
     @Test
-    public void blacklist() {
+    public void neitherWhiteListNorBlacklistSpecified(){
+        when(this.random.nextFloat()).thenReturn(0.0f);
+        fateEngine = new RandomFateEngine(new String[0], new String[0], 0.5f, this.environment, this.random);
+
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
+    }
+    
+    @Test
+    public void blacklistOnly() {
         when(this.random.nextFloat()).thenReturn(0.0f);
 
         assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
 
         assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
         assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
+    }
+    
+    @Test
+    public void whitelistOnly(){
+        when(this.random.nextFloat()).thenReturn(0.0f);
+        
+        String[] whitelist = new String[]{"test-deployment"};
+        fateEngine = new RandomFateEngine(new String[0], whitelist, 0.5f, this.environment, this.random);
+
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
+
+        whitelist = new String[]{"test-job-1"};
+        fateEngine = new RandomFateEngine(new String[0], whitelist, 0.5f, this.environment, this.random);
+
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
+    }
+    
+    @Test
+    public void whitelistAndBlacklistCombined(){
+        when(this.random.nextFloat()).thenReturn(0.0f);
+        
+        String[] whitelist = new String[]{"cf"};
+        String[] blacklist = new String[]{"ccdb", "uaadb"};
+        fateEngine = new RandomFateEngine(blacklist, whitelist, 0.5f, this.environment, this.random);
+
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "dea", "test-name-1")));
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "health_manager", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "ccdb", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "uaadb", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "mysql", "test-job", "test-name-1")));
+        
+
+        whitelist = new String[]{"dea"};
+        blacklist = new String[]{"ccdb", "uaadb"};
+        fateEngine = new RandomFateEngine(blacklist, whitelist, 0.5f, this.environment, this.random);
+
+        assertTrue(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "dea", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "health_manager", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "ccdb", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "cf", "uaadb", "test-name-1")));
+        assertFalse(this.fateEngine.shouldDie(new Member("test-id-1", "mysql", "test-job", "test-name-1")));
     }
 
     @Test
