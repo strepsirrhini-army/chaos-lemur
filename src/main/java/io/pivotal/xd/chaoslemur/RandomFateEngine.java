@@ -34,6 +34,8 @@ final class RandomFateEngine implements FateEngine {
 
     private final String[] blacklist;
 
+    private final String[] whitelist;
+
     private final String defaultProbability;
 
     private final Environment environment;
@@ -41,20 +43,23 @@ final class RandomFateEngine implements FateEngine {
     private final Random random;
 
     @Autowired
-    RandomFateEngine(@Value("${blacklist:}") String[] blacklist, @Value("${default.probability:0.2}") Float
-            defaultProbability, Environment environment, Random random) {
+    RandomFateEngine(@Value("${blacklist:}") String[] blacklist,
+                     @Value("${default.probability:0.2}") Float defaultProbability, Environment environment,
+                     Random random, @Value("${whitelist:}") String[] whitelist) {
         this.blacklist = blacklist;
         this.defaultProbability = defaultProbability.toString();
         this.environment = environment;
         this.random = random;
+        this.whitelist = whitelist;
 
         this.logger.info("Blacklist: {}", StringUtils.arrayToCommaDelimitedString(blacklist));
+        this.logger.info("Whitelist: {}", StringUtils.arrayToCommaDelimitedString(whitelist));
         this.logger.info("Default probability: {}", defaultProbability);
     }
 
     @Override
     public Boolean shouldDie(Member member) {
-        if (isBlacklisted(member)) {
+        if (!isWhitelisted(member) || isBlacklisted(member)) {
             return false;
         }
 
@@ -69,6 +74,11 @@ final class RandomFateEngine implements FateEngine {
 
     private boolean isBlacklisted(Member member) {
         return Arrays.stream(this.blacklist)
+                .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
+    }
+
+    private boolean isWhitelisted(Member member) {
+        return this.whitelist.length == 0 || Arrays.stream(this.whitelist)
                 .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
     }
 

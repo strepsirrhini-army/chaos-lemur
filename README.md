@@ -23,7 +23,7 @@ Since the application is designed to work in a PaaS environment, all configurati
 | `<DEPLOYMENT | JOB>_PROBABILITY` | The probability for a given deployment or job, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the `redis` job will be destroyed more often than a default VM.
 | `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
-| `BLACKLIST` | A comma delimited list of deployments and jobs. Any member of the deployment or job will be excluded from destruction. Default is blank, i.e. all members of all deployments and jobs are eligible for destruction.
+| `BLACKLIST` | A comma delimited list of deployments and jobs. Any member of the deployment or job will be excluded from destruction. Default is blank, i.e. all members of all deployments and jobs are eligible for destruction. Can be combined with `WHITELIST` (see below).
 | `DATADOG_APIKEY` | Allows Chaos Lemur to log destruction events to [DataDog][d]. If this value is not set Chaos Lemur will redirect the output to the logger at `INFO` level.
 | `DATADOG_APPKEY` | Used with the `DATADOG_APIKEY` to give DataDog access.
 | `DATADOG_TAGS` | A set of tags to attach to each DataDog event.
@@ -37,7 +37,14 @@ Since the application is designed to work in a PaaS environment, all configurati
 | `VSPHERE_HOST` | The vSphere host used to destroy VMs.
 | `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
 | `VSPHERE_USERNAME` | Used with `VSPHERE_HOST` to give vSphere access.
+| `WHITELIST` | A comma delimited list of deployments and jobs. If specified, only members of the deployment or job will be considered for destruction. If `WHITELIST` is not specified or blank, all deployments and jobs are eligible for destruction. Default is blank. Can be combined with `BLACKLIST` (see below).
 
+### Whitelists and Blacklists
+
+`BLACKLIST` and `WHITELIST` can be used individually as noted in the "Environment Variables" section above. They can also be combined for more complex filtering.
+The list of deployments and jobs is filtered first by excluding anything _not_ in the whitelist, and then by excluding everything in the blacklist.
+
+For example, say you had a BOSH environment with three deployments 'cf', 'redis', and 'mysql' and plan on adding additional deployments over time. You only want want the 'dea' and 'router' jobs in the 'cf' deployment to be eligible for destruction. One option is to `BLACKLIST: "redis, mysql"` as well as all the jobs in 'cf' except for 'dea' and 'router' (e.g. `BLACKLIST: "nfs_server, ccdb, uaadb, ha_proxy, ..."`) If you added any additional deployments or any new jobs were added to the 'redis' and 'mysql' deployments, you must remember to add those to the blacklist as well. Alternatively, you could `WHITELIST: "cf"` and then `BLACKLIST: "nfs_server, ccdb, uaadb, ha_proxy, ..."`.  With this approach you need only worry about managing the blacklist of 'cf' as its jobs change over time.
 
 ### Services
 Chaos Lemur can use Redis to persist its status across restarts (e,g. if the PaaS environment forces a reboot). If a [Redis Cloud instance][r] called `chaos-lemur-persistence` exists, Chaos Lemur will use it. Chaos Lemur only requires a few bytes of storage, so the smallest Redis plan should be sufficient.
