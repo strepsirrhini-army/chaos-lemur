@@ -17,36 +17,44 @@ Although Chaos Lemur recognizes deployments and jobs, it is not possible to sele
 ### Java, Maven
 The application is written in Java 8 and packaged as a self executable JAR file. This enables it to run anywhere that Java is available. Building the application (required for deployment) requires [Maven][m].
 
-### Environment Variables
+## Configuration
 Since the application is designed to work in a PaaS environment, all configuration is done with environment variables. Chaos Lemur requires an infrastructure to be configured, so you must set either the AWS, VSPHERE, or SIMPLE_INFRASTRUCTURE values.
 
 | Key | Description
 | --- | -----------
 | `<DEPLOYMENT | JOB>_PROBABILITY` | The probability for a given deployment or job, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the `redis` job will be destroyed more often than a default VM.
+| `BLACKLIST` | A comma delimited list of deployments and jobs. Any member of the deployment or job will be excluded from destruction. Default is blank, i.e. all members of all deployments and jobs are eligible for destruction. Can be combined with `WHITELIST` (see below).
+| `DEFAULT_PROBABILITY` | The default probability for a VM to be destroyed, ranging from `0.0` (will never be destroyed) to `1.0` (will always be destroyed). The probability is per run, with each run independent of any other. Default is `0.2`.
+| `DRYRUN` | Causes Chaos Lemur to omit the _actual_ destruction of VMs, but work properly in all other respects.  The default is `false`.
+| `SCHEDULE` | The schedule to trigger a run of Chaos Lemur. Defined using Spring cron syntax, so `0 0/10 * * * *` would run every 10 minutes. Default is  `0 0 * * * *` (once per hour, on the hour).
+| `WHITELIST` | A comma delimited list of deployments and jobs. If specified, only members of the deployment or job will be considered for destruction. If `WHITELIST` is not specified or blank, all deployments and jobs are eligible for destruction. Default is blank. Can be combined with `BLACKLIST` (see below).
+
+`BLACKLIST` and `WHITELIST` can be used individually as noted above. They can also be combined for more complex filtering.
+The list of deployments and jobs is filtered first by excluding anything _not_ in the whitelist, and then by excluding everything in the blacklist.
+
+For example, say you had a BOSH environment with three deployments 'cf', 'redis', and 'mysql' and plan on adding additional deployments over time. You only want want the 'dea' and 'router' jobs in the 'cf' deployment to be eligible for destruction. One option is to `BLACKLIST: "redis, mysql"` as well as all the jobs in 'cf' except for 'dea' and 'router' (e.g. `BLACKLIST: "nfs_server, ccdb, uaadb, ha_proxy, ..."`) If you added any additional deployments or any new jobs were added to the 'redis' and 'mysql' deployments, you must remember to add those to the blacklist as well. Alternatively, you could `WHITELIST: "cf"` and then `BLACKLIST: "nfs_server, ccdb, uaadb, ha_proxy, ..."`.  With this approach you need only worry about managing the blacklist of 'cf' as its jobs change over time.
+
+### Infrastructure
+
+| Key | Description
+| --- | -----------
 | `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
-| `BLACKLIST` | A comma delimited list of deployments and jobs. Any member of the deployment or job will be excluded from destruction. Default is blank, i.e. all members of all deployments and jobs are eligible for destruction. Can be combined with `WHITELIST` (see below).
-| `DATADOG_APIKEY` | Allows Chaos Lemur to log destruction events to [DataDog][d]. If this value is not set Chaos Lemur will redirect the output to the logger at `INFO` level.
-| `DATADOG_APPKEY` | Used with the `DATADOG_APIKEY` to give DataDog access.
-| `DATADOG_TAGS` | A set of tags to attach to each DataDog event.
-| `DEFAULT_PROBABILITY` | The default probability for a VM to be destroyed, ranging from `0.0` (will never be destroyed) to `1.0` (will always be destroyed). The probability is per run, with each run independent of any other. Default is `0.2`.
 | `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
 | `DIRECTOR_PASSWORD` | Used with `DIRECTOR_HOST` to give BOSH Director access.
 | `DIRECTOR_USERNAME` | Used with `DIRECTOR_HOST` to give BOSH Director access.
-| `DRYRUN` | Causes Chaos Lemur to omit the _actual_ destruction of VMs, but work properly in all other respects.  The default is `false`.
-| `SCHEDULE` | The schedule to trigger a run of Chaos Lemur. Defined using Spring cron syntax, so `0 0/10 * * * *` would run every 10 minutes. Default is  `0 0 * * * *` (once per hour, on the hour).
 | `SIMPLE_INFRASTRUCTURE` | Chaos Lemur will use its built-in infrastructure rather than AWS or vSphere. Useful for testing. The value for the variable is not read, but something is required for Cloud Foundry (e.g. 'true').
 | `VSPHERE_HOST` | The vSphere host used to destroy VMs.
 | `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
 | `VSPHERE_USERNAME` | Used with `VSPHERE_HOST` to give vSphere access.
-| `WHITELIST` | A comma delimited list of deployments and jobs. If specified, only members of the deployment or job will be considered for destruction. If `WHITELIST` is not specified or blank, all deployments and jobs are eligible for destruction. Default is blank. Can be combined with `BLACKLIST` (see below).
 
-### Whitelists and Blacklists
+### Reporting
 
-`BLACKLIST` and `WHITELIST` can be used individually as noted in the "Environment Variables" section above. They can also be combined for more complex filtering.
-The list of deployments and jobs is filtered first by excluding anything _not_ in the whitelist, and then by excluding everything in the blacklist.
-
-For example, say you had a BOSH environment with three deployments 'cf', 'redis', and 'mysql' and plan on adding additional deployments over time. You only want want the 'dea' and 'router' jobs in the 'cf' deployment to be eligible for destruction. One option is to `BLACKLIST: "redis, mysql"` as well as all the jobs in 'cf' except for 'dea' and 'router' (e.g. `BLACKLIST: "nfs_server, ccdb, uaadb, ha_proxy, ..."`) If you added any additional deployments or any new jobs were added to the 'redis' and 'mysql' deployments, you must remember to add those to the blacklist as well. Alternatively, you could `WHITELIST: "cf"` and then `BLACKLIST: "nfs_server, ccdb, uaadb, ha_proxy, ..."`.  With this approach you need only worry about managing the blacklist of 'cf' as its jobs change over time.
+| Key | Description
+| --- | -----------
+| `DATADOG_APIKEY` | Allows Chaos Lemur to log destruction events to [DataDog][d]. If this value is not set Chaos Lemur will redirect the output to the logger at `INFO` level.
+| `DATADOG_APPKEY` | Used with the `DATADOG_APIKEY` to give DataDog access.
+| `DATADOG_TAGS` | A set of tags to attach to each DataDog event.
 
 ### Services
 Chaos Lemur can use Redis to persist its status across restarts (e,g. if the PaaS environment forces a reboot). If a [Redis Cloud instance][r] called `chaos-lemur-persistence` exists, Chaos Lemur will use it. Chaos Lemur only requires a few bytes of storage, so the smallest Redis plan should be sufficient.
