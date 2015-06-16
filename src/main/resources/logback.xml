@@ -30,6 +30,7 @@
     <logger name="org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration" level="INFO"/>
     <logger name="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping" level="INFO"/>
     <logger name="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping" level="INFO"/>
+    <logger name="org.springframework.boot.autoconfigure.security" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
