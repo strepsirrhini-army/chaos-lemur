@@ -31,7 +31,7 @@
 
     <groupId>io.pivotal.chaos-lemur</groupId>
     <artifactId>chaos-lemur</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>4-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
