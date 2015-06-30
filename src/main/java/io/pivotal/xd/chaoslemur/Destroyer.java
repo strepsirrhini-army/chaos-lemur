@@ -132,32 +132,32 @@ final class Destroyer {
 
         this.logger.info("{} Beginning run...", identifier);
 
-        this.infrastructure.getMembers().stream().map(member -> {
-            return this.executorService.submit(() -> {
-                if (this.fateEngine.shouldDie(member)) {
-                    try {
-                        this.logger.debug("{} Destroying: {}", identifier, member);
+        this.infrastructure.getMembers().stream()
+                .map(member -> this.executorService.submit(() -> {
+                    if (this.fateEngine.shouldDie(member)) {
+                        try {
+                            this.logger.debug("{} Destroying: {}", identifier, member);
 
-                        if (this.dryRun) {
-                            this.logger.info("{} Destroyed (Dry Run): {}", identifier, member);
-                        } else {
-                            this.infrastructure.destroy(member);
-                            this.logger.info("{} Destroyed: {}", identifier, member);
+                            if (this.dryRun) {
+                                this.logger.info("{} Destroyed (Dry Run): {}", identifier, member);
+                            } else {
+                                this.infrastructure.destroy(member);
+                                this.logger.info("{} Destroyed: {}", identifier, member);
+                            }
+
+                            destroyedMembers.add(member);
+                        } catch (DestructionException e) {
+                            this.logger.warn("{} Destroy failed: {}", identifier, member, e);
                         }
-
-                        destroyedMembers.add(member);
-                    } catch (DestructionException e) {
-                        this.logger.warn("{} Destroy failed: {}", identifier, member, e);
                     }
-                }
-            });
-        }).forEach(future -> {
-            try {
-                future.get();
-            } catch (InterruptedException | ExecutionException e) {
-                this.logger.warn("{} Failed to destroy member", identifier, e);
-            }
-        });
+                }))
+                .forEach(future -> {
+                    try {
+                        future.get();
+                    } catch (InterruptedException | ExecutionException e) {
+                        this.logger.warn("{} Failed to destroy member", identifier, e);
+                    }
+                });
 
         this.reporter.sendEvent(title(identifier), message(destroyedMembers));
 

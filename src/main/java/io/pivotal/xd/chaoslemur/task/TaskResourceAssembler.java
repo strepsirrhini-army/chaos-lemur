@@ -30,7 +30,7 @@ final class TaskResourceAssembler implements ResourceAssembler<Task, Resource<Ta
 
     @Override
     public Resource<Task> toResource(Task task) {
-        Resource resource = new Resource<>(task);
+        Resource<Task> resource = new Resource<>(task);
 
         resource.add(getTaskLinkBuilder(task).withSelfRel());
 
