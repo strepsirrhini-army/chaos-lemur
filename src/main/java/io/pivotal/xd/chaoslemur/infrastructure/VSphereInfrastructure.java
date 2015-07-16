@@ -18,7 +18,6 @@ package io.pivotal.xd.chaoslemur.infrastructure;
 
 import com.vmware.vim25.TaskInfo;
 import com.vmware.vim25.TaskInfoState;
-import com.vmware.vim25.mo.InventoryNavigator;
 import com.vmware.vim25.mo.Task;
 import com.vmware.vim25.mo.VirtualMachine;
 import io.pivotal.xd.chaoslemur.Member;

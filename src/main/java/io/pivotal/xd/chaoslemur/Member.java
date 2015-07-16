@@ -94,9 +94,7 @@ public final class Member implements Comparable<Member> {
 
         Member member = (Member) o;
 
-        if (name != null ? !name.equals(member.name) : member.name != null) return false;
-
-        return true;
+        return name == null ? member.name == null : name.equals(member.name);
     }
 
     @Override
