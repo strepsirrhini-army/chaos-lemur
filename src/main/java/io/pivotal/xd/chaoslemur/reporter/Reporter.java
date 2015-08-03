@@ -23,9 +23,8 @@ public interface Reporter {
     /**
      * Sends an Event to an Event Recorder
      *
-     * @param title   The title of the Event
-     * @param message The message of the Event
+     * @param event   The {@link Event} to report
      */
-    void sendEvent(String title, String message);
+    void sendEvent(Event event);
 
 }

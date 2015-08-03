@@ -18,11 +18,14 @@ package io.pivotal.xd.chaoslemur.reporter;
 
 import org.junit.Test;
 
+import java.util.Collections;
+import java.util.UUID;
+
 public final class NoOpReporterTest {
 
     @Test
     public void sendEvent() {
         Reporter reporter = new NoOpReporter();
-        reporter.sendEvent("test-title", "test-message");
+        reporter.sendEvent(new Event(UUID.randomUUID(), Collections.emptyList()));
     }
 }

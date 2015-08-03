@@ -16,13 +16,18 @@
 
 package io.pivotal.xd.chaoslemur.reporter;
 
+import io.pivotal.xd.chaoslemur.Member;
+import org.atteo.evo.inflector.English;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 final class DataDogReporter implements Reporter {
 
@@ -47,10 +52,10 @@ final class DataDogReporter implements Reporter {
     }
 
     @Override
-    public void sendEvent(String title, String message) {
+    public void sendEvent(Event event) {
         Map<String, Object> payload = new HashMap<>();
-        payload.put("title", title);
-        payload.put("text", message);
+        payload.put("title", title(event.getIdentifier()));
+        payload.put("text", message(event.getMembers()));
         payload.put("tags", this.tags);
 
         try {
@@ -58,5 +63,22 @@ final class DataDogReporter implements Reporter {
         } catch (HttpClientErrorException e) {
             this.logger.warn(e.getResponseBodyAsString());
         }
+    }
+
+    private String message(List<Member> members) {
+        int size = members.size();
+
+        String s = "\n";
+        s += size + English.plural(" VM", size) + " destroyed:\n";
+        s += members.stream()
+                .sorted()
+                .map(member -> String.format("  • %s", member.getName()))
+                .collect(Collectors.joining("\n"));
+
+        return s;
+    }
+
+    private String title(UUID identifier) {
+        return String.format("Chaos Lemur Destruction (%s)", identifier);
     }
 }
