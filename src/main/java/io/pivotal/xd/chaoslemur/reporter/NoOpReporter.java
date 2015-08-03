@@ -19,13 +19,19 @@ package io.pivotal.xd.chaoslemur.reporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.stream.Collectors;
+
 final class NoOpReporter implements Reporter {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public void sendEvent(String title, String message) {
-        this.logger.info("{}:\n{}", title, message);
+    public void sendEvent(Event event) {
+        this.logger.info("Chaos Lemur Destruction ({})", event.getIdentifier());
+
+        event.getMembers().stream()
+                .sorted()
+                .forEach(member -> this.logger.info("  • {}", member.getName()));
     }
 
 }

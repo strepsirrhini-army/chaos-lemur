@@ -23,6 +23,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.Collections;
+import java.util.UUID;
+
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
@@ -43,22 +46,22 @@ public final class DataDogReporterTest {
 
     @Test
     public void sendEvent() {
-        mockServer.expect(requestTo(URI))
+        this.mockServer.expect(requestTo(URI))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("resultSuccess", MediaType.TEXT_PLAIN));
 
-        dataDog.sendEvent("Title", "Message");
+        this.dataDog.sendEvent(new Event(UUID.randomUUID(), Collections.emptyList()));
 
         this.mockServer.verify();
     }
 
     @Test
     public void badSendEvent() {
-        mockServer.expect(requestTo(URI))
+        this.mockServer.expect(requestTo(URI))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withBadRequest());
 
-        dataDog.sendEvent("Title", "Message");
+        this.dataDog.sendEvent(new Event(UUID.randomUUID(), Collections.emptyList()));
 
         this.mockServer.verify();
     }

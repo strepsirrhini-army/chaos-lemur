@@ -18,6 +18,7 @@ package io.pivotal.xd.chaoslemur;
 
 import io.pivotal.xd.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.xd.chaoslemur.infrastructure.Infrastructure;
+import io.pivotal.xd.chaoslemur.reporter.Event;
 import io.pivotal.xd.chaoslemur.reporter.Reporter;
 import io.pivotal.xd.chaoslemur.state.State;
 import io.pivotal.xd.chaoslemur.state.StateProvider;
@@ -25,7 +26,6 @@ import io.pivotal.xd.chaoslemur.task.Task;
 import io.pivotal.xd.chaoslemur.task.TaskRepository;
 import io.pivotal.xd.chaoslemur.task.TaskUriBuilder;
 import io.pivotal.xd.chaoslemur.task.Trigger;
-import org.atteo.evo.inflector.English;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,6 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
-import java.util.stream.Collectors;
 
 @RestController
 final class Destroyer {
@@ -159,27 +158,9 @@ final class Destroyer {
                     }
                 });
 
-        this.reporter.sendEvent(title(identifier), message(destroyedMembers));
+        this.reporter.sendEvent(new Event(identifier, destroyedMembers));
 
         task.stop();
-    }
-
-    private String message(List<Member> members) {
-        int size = members.size();
-
-        String SPACE = "\u00A0";
-        String BULLET = "\u2022";
-
-        String s = "\n";
-        s += size + English.plural(" VM", size) + " destroyed:\n";
-        s += members.stream().sorted().map((member) -> SPACE + SPACE + BULLET + SPACE + member.getName()).collect
-                (Collectors.joining("\n"));
-
-        return s;
-    }
-
-    private String title(UUID identifier) {
-        return String.format("Chaos Lemur Destruction (%s)", identifier);
     }
 
 }
