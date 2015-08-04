@@ -23,7 +23,7 @@
         </encoder>
     </appender>
 
-    <logger name="io.pivotal.xd.chaoslemur" level="${LOGGING_LEVEL:-INFO}"/>
+    <logger name="io.pivotal.strepsirrhini.chaoslemur" level="${LOGGING_LEVEL:-INFO}"/>
     <logger name="org.apache" level="ERROR"/>
     <logger name="org.cloudfoundry.reconfiguration" level="INFO"/>
     <logger name="org.springframework.boot.actuate.endpoint.mvc.EndpointHandlerMapping" level="INFO"/>
