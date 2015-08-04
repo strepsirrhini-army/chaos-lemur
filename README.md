@@ -1,5 +1,5 @@
 # Chaos Lemur
-[![Build Status](https://travis-ci.org/pivotal-cf/chaos-lemur.svg)](https://travis-ci.org/pivotal-cf/chaos-lemur)
+[![Build Status](https://travis-ci.org/strepsirrhini-army/chaos-lemur.svg)](https://travis-ci.org/strepsirrhini-army/chaos-lemur)
 
 This project is a self-hostable application to randomly destroy virtual machines in a BOSH-managed environment, as an aid to resilience testing of high-availability systems. Its main features are:
 
