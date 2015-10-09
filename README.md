@@ -39,6 +39,7 @@ Chaos Lemur requires an infrastructure to be configured, so you must set either 
 
 | Key | Description
 | --- | -----------
+| `AWS_EC2REGION` | Specify which AWS region to kills VM's on, default is us-east-1
 | `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
 | `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates

@@ -32,7 +32,7 @@ public final class AwsInfrastructureTest {
 
     private final DirectorUtils directorUtils = mock(DirectorUtils.class);
 
-    private final AwsInfrastructure infrastructure = new AwsInfrastructure(this.directorUtils, this.amazonEC2);
+    private final AwsInfrastructure infrastructure = new AwsInfrastructure(this.directorUtils, this.amazonEC2,"us-east-1");
 
     @Test
     public void destroy() throws Exception {
