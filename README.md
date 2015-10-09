@@ -22,7 +22,7 @@ Since the application is designed to work in a PaaS environment, all configurati
 
 | Key | Description
 | --- | -----------
-| `<DEPLOYMENT | JOB>_PROBABILITY` | The probability for a given deployment or job, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the `redis` job will be destroyed more often than a default VM.
+| `<DEPLOYMENT` | `JOB_PROBABILITY` | The probability for a given deployment or job, overriding the default. For example, `REDIS_PROBABILITY` set to `0.3` means that VMs in the `redis` job will be destroyed more often than a default VM.
 | `BLACKLIST` | A comma delimited list of deployments and jobs. Any member of the deployment or job will be excluded from destruction. Default is blank, i.e. all members of all deployments and jobs are eligible for destruction. Can be combined with `WHITELIST` (see below).
 | `DEFAULT_PROBABILITY` | The default probability for a VM to be destroyed, ranging from `0.0` (will never be destroyed) to `1.0` (will always be destroyed). The probability is per run, with each run independent of any other. Default is `0.2`.
 | `DRYRUN` | Causes Chaos Lemur to omit the _actual_ destruction of VMs, but work properly in all other respects.  The default is `false`.
@@ -39,6 +39,7 @@ Chaos Lemur requires an infrastructure to be configured, so you must set either 
 
 | Key | Description
 | --- | -----------
+| `AWS_REGION` | The AWS region in which to kill VM's. Default is us-east-1
 | `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
 | `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
