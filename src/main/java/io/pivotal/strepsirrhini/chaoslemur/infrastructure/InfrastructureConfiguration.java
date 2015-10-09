@@ -39,8 +39,9 @@ class InfrastructureConfiguration {
 
     @Bean
     @ConditionalOnBean(AmazonEC2.class)
-    Infrastructure awsInfrastructure(StandardDirectorUtils directorUtils, AmazonEC2 amazonEC2) {
-        return new AwsInfrastructure(directorUtils, amazonEC2);
+    @ConditionalOnProperty("aws.ec2Region")
+    Infrastructure awsInfrastructure(StandardDirectorUtils directorUtils, AmazonEC2 amazonEC2,  @Value("${aws.ec2Region:us-east-1}") String ec2Region) {
+        return new AwsInfrastructure(directorUtils, amazonEC2,  ec2Region);
     }
 
     @Bean

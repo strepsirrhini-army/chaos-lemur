@@ -26,16 +26,19 @@ import java.util.List;
 final class AwsInfrastructure extends AbstractDirectorUtilsInfrastructure {
 
     private final AmazonEC2 amazonEC2;
-
-    AwsInfrastructure(DirectorUtils directorUtils, AmazonEC2 amazonEC2) {
+    private final String ec2Region;
+    
+    AwsInfrastructure(DirectorUtils directorUtils, AmazonEC2 amazonEC2, String ec2Region) {
         super(directorUtils);
         this.amazonEC2 = amazonEC2;
+        this.ec2Region= ec2Region;
     }
 
     @Override
     public void destroy(Member member) throws DestructionException {
         List<String> terminate = new ArrayList<>();
         terminate.add(member.getId());
+        amazonEC2.setEndpoint("https://ec2."+ ec2Region + ".amazonaws.com");
         TerminateInstancesRequest tir = new TerminateInstancesRequest(terminate);
         this.amazonEC2.terminateInstances(tir);
     }
