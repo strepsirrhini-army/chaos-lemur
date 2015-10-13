@@ -17,6 +17,8 @@
 package io.pivotal.strepsirrhini.chaoslemur.infrastructure;
 
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Region;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,8 +35,14 @@ class InfrastructureConfiguration {
     @Bean
     @ConditionalOnProperty("aws.accessKeyId")
     AmazonEC2 amazonEC2(@Value("${aws.accessKeyId}") String accessKeyId,
-                        @Value("${aws.secretAccessKey}") String secretAccessKey) {
-        return new AmazonEC2Client(new BasicAWSCredentials(accessKeyId, secretAccessKey));
+                        @Value("${aws.secretAccessKey}") String secretAccessKey,
+                        @Value("${aws.region:us-east-1}") String regionName) {
+
+        AmazonEC2Client amazonEC2Client = new AmazonEC2Client(new BasicAWSCredentials(accessKeyId, secretAccessKey));
+        Region region = Region.getRegion(Regions.fromName(regionName));
+        amazonEC2Client.setEndpoint(region.getServiceEndpoint("ec2"));
+
+        return amazonEC2Client;
     }
 
     @Bean
