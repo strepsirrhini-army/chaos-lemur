@@ -31,7 +31,7 @@
 
     <groupId>io.pivotal.strepsirrhini</groupId>
     <artifactId>chaos-lemur</artifactId>
-    <version>4-SNAPSHOT</version>
+    <version>4</version>
     <packaging>jar</packaging>
 
     <properties>
