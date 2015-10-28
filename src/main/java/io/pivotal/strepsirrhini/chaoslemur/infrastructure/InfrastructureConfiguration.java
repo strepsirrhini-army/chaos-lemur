@@ -21,6 +21,8 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -73,5 +75,24 @@ class InfrastructureConfiguration {
     Infrastructure simpleInfrastructure() {
         return new SimpleInfrastructure();
     }
+    
+    @Autowired
+    DirectorUtils directorUtils;
+    
+    @Bean
+    @ConditionalOnProperty("jclouds.endpoint")
+    Infrastructure jcloudsInfra(
+    		@Value("${jclouds.endpoint}") String endpoint,
+            @Value("${jclouds.tenant}") String tenant,    		
+    		@Value("${jclouds.username}") String username,
+            @Value("${jclouds.password}") String password,
+            @Value("${jclouds.proxyhost}") String proxyhost,
+            @Value("${jclouds.proxyport}") String proxyport
+            ) {
+    	
+        return new JCloudsComputeInfrastructure(this.directorUtils,endpoint,tenant, username,password,proxyhost,proxyport);
+    }
+    
+
 
 }
