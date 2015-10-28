@@ -21,6 +21,8 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -66,6 +68,25 @@ class InfrastructureConfiguration {
     Infrastructure simpleInfrastructure() {
         return new SimpleInfrastructure();
     }
+    
+    @Autowired
+    DirectorUtils directorUtils;
+    
+    @Bean
+    @ConditionalOnProperty("openstack.endpoint")
+    Infrastructure jcloudsInfra(
+    		@Value("${openstack.endpoint}") String endpoint,
+            @Value("${openstack.tenant}") String tenant,    		
+    		@Value("${openstack.username}") String username,
+            @Value("${openstack.password}") String password,
+            @Value("${openstack.proxyhost}") String proxyhost,
+            @Value("${openstack.proxyport}") String proxyport
+            ) {
+    	
+        return new JCloudsComputeInfrastructure(this.directorUtils,endpoint,tenant, username,password,proxyhost,proxyport);
+    }
+    
+
 
     @Bean
     @ConditionalOnBean(InventoryNavigatorFactory.class)
