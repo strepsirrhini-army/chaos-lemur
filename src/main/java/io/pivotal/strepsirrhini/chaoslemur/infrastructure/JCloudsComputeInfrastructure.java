@@ -18,8 +18,10 @@ package io.pivotal.strepsirrhini.chaoslemur.infrastructure;
 
 import io.pivotal.strepsirrhini.chaoslemur.Member;
 
+import java.util.Properties;
 import java.util.Set;
 
+import org.jclouds.Constants;
 import org.jclouds.ContextBuilder;
 import org.jclouds.logging.slf4j.config.SLF4JLoggingModule;
 import org.jclouds.openstack.nova.v2_0.NovaApi;
@@ -52,11 +54,17 @@ final class JCloudsComputeInfrastructure extends AbstractDirectorUtilsInfrastruc
         
         
         logger.debug("logging as {}",identity);
+        
+        // see https://issues.apache.org/jira/browse/JCLOUDS-816
+        Properties props = new Properties();
+        props.put(Constants.PROPERTY_TRUST_ALL_CERTS, "true");
+        props.put(Constants.PROPERTY_RELAX_HOSTNAME, "true");
 
         novaApi = ContextBuilder.newBuilder(provider)
                 .endpoint(endpoint)
                 .credentials(identity, credential)
                 .modules(modules)
+                .overrides(props)
                 .buildApi(NovaApi.class);
         regions = novaApi.getConfiguredRegions();
 
