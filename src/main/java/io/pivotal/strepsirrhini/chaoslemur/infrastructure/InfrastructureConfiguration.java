@@ -80,14 +80,14 @@ class InfrastructureConfiguration {
     DirectorUtils directorUtils;
     
     @Bean
-    @ConditionalOnProperty("jclouds.endpoint")
+    @ConditionalOnProperty("openstack.endpoint")
     Infrastructure jcloudsInfra(
-    		@Value("${jclouds.endpoint}") String endpoint,
-            @Value("${jclouds.tenant}") String tenant,    		
-    		@Value("${jclouds.username}") String username,
-            @Value("${jclouds.password}") String password,
-            @Value("${jclouds.proxyhost}") String proxyhost,
-            @Value("${jclouds.proxyport}") String proxyport
+    		@Value("${openstack.endpoint}") String endpoint,
+            @Value("${openstack.tenant}") String tenant,    		
+    		@Value("${openstack.username}") String username,
+            @Value("${openstack.password}") String password,
+            @Value("${openstack.proxyhost}") String proxyhost,
+            @Value("${openstack.proxyport}") String proxyport
             ) {
     	
         return new JCloudsComputeInfrastructure(this.directorUtils,endpoint,tenant, username,password,proxyhost,proxyport);
