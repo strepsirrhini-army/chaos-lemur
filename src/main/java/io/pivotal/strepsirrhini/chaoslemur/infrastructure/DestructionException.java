@@ -21,6 +21,8 @@ package io.pivotal.strepsirrhini.chaoslemur.infrastructure;
  */
 public final class DestructionException extends Exception {
 
+    private static final long serialVersionUID = -3053977917321828063L;
+
     /**
      * Constructs a new exception with {@code null} as its detail message. The cause is not initialized, and may subsequently be initialized by a call to {@link #initCause}.
      */

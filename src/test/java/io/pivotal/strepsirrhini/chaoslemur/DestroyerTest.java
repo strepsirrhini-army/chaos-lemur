@@ -58,7 +58,8 @@ public final class DestroyerTest {
 
     private final FateEngine fateEngine = mock(FateEngine.class);
 
-    private final Future future = mock(Future.class);
+    @SuppressWarnings("unchecked")
+    private final Future<Void> future = mock(Future.class);
 
     private final Infrastructure infrastructure = mock(Infrastructure.class);
 
@@ -136,8 +137,8 @@ public final class DestroyerTest {
     @Before
     @SuppressWarnings("unchecked")
     public void executor() throws ExecutionException, InterruptedException {
-        when(this.executorService.submit(any(Runnable.class))).thenReturn(this.future);
-        when(this.future.get()).thenReturn(true);
+        when((Future<Void>) this.executorService.submit(any(Runnable.class))).thenReturn(this.future);
+        when(this.future.get()).thenReturn(null);
     }
 
     @Test
