@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
-pushd chaos-lemur
-  ./mvnw -q -Dmaven.test.skip=true deploy
-popd
+cd chaos-lemur
+./mvnw -q -Dmaven.test.skip=true deploy

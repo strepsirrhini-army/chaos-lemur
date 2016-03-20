@@ -1,7 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
-pushd chaos-lemur
-  ./mvnw -q package
-popd
+cd chaos-lemur
+./mvnw -q package
