@@ -1,0 +1,14 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: java
+    tag: 8-jdk
+
+inputs:
+- name: chaos-lemur
+
+run:
+  path: chaos-lemur/ci/unit-test.sh
