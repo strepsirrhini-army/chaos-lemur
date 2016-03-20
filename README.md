@@ -49,6 +49,15 @@ Chaos Lemur requires an infrastructure to be configured, so you must set either 
 | `VSPHERE_HOST` | The vSphere host used to destroy VMs.
 | `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
 | `VSPHERE_USERNAME` | Used with `VSPHERE_HOST` to give vSphere access.
+| `OPENSTACK_ENDPOINT` | The openstack api endpoint to use to destroy VMs.
+| `OPENSTACK_TENANT`   | Used with `OPENSTACK_ENDPOINT` to give the openstack tenant VMs if the  to destroy .
+| `OPENSTACK_PASSWORD` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
+| `OPENSTACK_USERNAME` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
+
+
+
+
+
 
 ### Reporting
 

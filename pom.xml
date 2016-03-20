@@ -40,6 +40,7 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <vijava.version>5.1</vijava.version>
+        <jclouds.version>1.9.2</jclouds.version>
     </properties>
 
     <dependencies>
@@ -61,6 +62,25 @@
             <artifactId>vijava</artifactId>
             <version>${vijava.version}</version>
         </dependency>
+        
+		<dependency>
+	      <groupId>org.apache.jclouds.api</groupId>
+	      <artifactId>openstack-keystone</artifactId>
+	      <version>${jclouds.version}</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.apache.jclouds.api</groupId>
+	      <artifactId>openstack-nova</artifactId>
+	      <version>${jclouds.version}</version>
+	    </dependency>        
+
+		<dependency>
+			<groupId>org.apache.jclouds.driver</groupId>
+			<artifactId>jclouds-slf4j</artifactId>
+			<version>${jclouds.version}</version>
+		</dependency>
+
+        
         <dependency>
             <groupId>org.atteo</groupId>
             <artifactId>evo-inflector</artifactId>
