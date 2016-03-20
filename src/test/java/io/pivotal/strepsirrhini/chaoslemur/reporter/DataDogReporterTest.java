@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,32 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public final class DataDogReporterTest {
 
     private static final String URI = "https://app.datadoghq.com/api/v1/events?api_key=apiKey&application_key=appKey";
+
     private Reporter dataDog;
+
     private MockRestServiceServer mockServer;
+
+    @Test
+    public void badSendEvent() {
+        this.mockServer.expect(requestTo(URI))
+            .andExpect(method(HttpMethod.POST))
+            .andRespond(withBadRequest());
+
+        this.dataDog.sendEvent(new Event(UUID.randomUUID(), Collections.emptyList()));
+
+        this.mockServer.verify();
+    }
+
+    @Test
+    public void sendEvent() {
+        this.mockServer.expect(requestTo(URI))
+            .andExpect(method(HttpMethod.POST))
+            .andRespond(withSuccess("resultSuccess", MediaType.TEXT_PLAIN));
+
+        this.dataDog.sendEvent(new Event(UUID.randomUUID(), Collections.emptyList()));
+
+        this.mockServer.verify();
+    }
 
     @Before
     public void setup() {
@@ -44,25 +68,4 @@ public final class DataDogReporterTest {
         this.dataDog = new DataDogReporter("apiKey", "appKey", restTemplate, new String[]{"key:value"});
     }
 
-    @Test
-    public void sendEvent() {
-        this.mockServer.expect(requestTo(URI))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("resultSuccess", MediaType.TEXT_PLAIN));
-
-        this.dataDog.sendEvent(new Event(UUID.randomUUID(), Collections.emptyList()));
-
-        this.mockServer.verify();
-    }
-
-    @Test
-    public void badSendEvent() {
-        this.mockServer.expect(requestTo(URI))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withBadRequest());
-
-        this.dataDog.sendEvent(new Event(UUID.randomUUID(), Collections.emptyList()));
-
-        this.mockServer.verify();
-    }
 }

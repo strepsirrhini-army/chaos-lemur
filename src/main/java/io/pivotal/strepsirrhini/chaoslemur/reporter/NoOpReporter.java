@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ final class NoOpReporter implements Reporter {
         this.logger.info("Chaos Lemur Destruction ({})", event.getIdentifier());
 
         event.getMembers().stream()
-                .sorted()
-                .forEach(member -> this.logger.info("  • {}", member.getName()));
+            .sorted()
+            .forEach(member -> this.logger.info("  • {}", member.getName()));
     }
 
 }

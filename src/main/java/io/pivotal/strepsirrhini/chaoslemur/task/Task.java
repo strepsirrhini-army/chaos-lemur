@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,13 +29,14 @@ public final class Task {
 
     private final LocalDateTime startDate = LocalDateTime.now();
 
-    private volatile TaskStatus status = TaskStatus.IN_PROGRESS;
-
     private final Trigger trigger;
+
+    private volatile TaskStatus status = TaskStatus.IN_PROGRESS;
 
     /**
      * Create a new task
-     * @param id Unique id for the task
+     *
+     * @param id      Unique id for the task
      * @param trigger The {@code Trigger} for the task
      */
     public Task(Long id, Trigger trigger) {
@@ -54,21 +55,21 @@ public final class Task {
     }
 
     /**
-     * Returns the status of the task
-     *
-     * @return the {@code TaskStatus} of the task
-     */
-    public TaskStatus getStatus() {
-        return this.status;
-    }
-
-    /**
      * Returns the start time of the task
      *
      * @return the start time of the task
      */
     public LocalDateTime getStart() {
         return this.startDate;
+    }
+
+    /**
+     * Returns the status of the task
+     *
+     * @return the {@code TaskStatus} of the task
+     */
+    public TaskStatus getStatus() {
+        return this.status;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,16 +45,6 @@ public class Application {
         SpringApplication.run(Application.class, args);
     }
 
-    @Bean
-    Random random() {
-        return new SecureRandom();
-    }
-
-    @Bean
-    RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
     @Bean(destroyMethod = "shutdown")
     ThreadPoolExecutorFactoryBean executor() {
         ThreadPoolExecutorFactoryBean factoryBean = new ThreadPoolExecutorFactoryBean();
@@ -69,6 +59,16 @@ public class Application {
     @Bean
     ObjectMapper objectMapper() {
         return new ObjectMapper().disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
+
+    @Bean
+    Random random() {
+        return new SecureRandom();
+    }
+
+    @Bean
+    RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 
 }

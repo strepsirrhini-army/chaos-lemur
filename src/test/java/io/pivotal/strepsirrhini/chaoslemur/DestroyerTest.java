@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 package io.pivotal.strepsirrhini.chaoslemur;
 
-import io.pivotal.strepsirrhini.chaoslemur.reporter.Reporter;
-import io.pivotal.strepsirrhini.chaoslemur.state.StateProvider;
-import io.pivotal.strepsirrhini.chaoslemur.task.TaskUriBuilder;
 import io.pivotal.strepsirrhini.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.strepsirrhini.chaoslemur.infrastructure.Infrastructure;
+import io.pivotal.strepsirrhini.chaoslemur.reporter.Reporter;
 import io.pivotal.strepsirrhini.chaoslemur.state.State;
+import io.pivotal.strepsirrhini.chaoslemur.state.StateProvider;
 import io.pivotal.strepsirrhini.chaoslemur.task.Task;
 import io.pivotal.strepsirrhini.chaoslemur.task.TaskRepository;
+import io.pivotal.strepsirrhini.chaoslemur.task.TaskUriBuilder;
 import io.pivotal.strepsirrhini.chaoslemur.task.Trigger;
 import org.junit.Before;
 import org.junit.Test;
@@ -54,8 +54,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 
 public final class DestroyerTest {
 
-    private final ArgumentCaptor<Runnable> runnableCaptor = ArgumentCaptor.forClass(Runnable.class);
-
     private final ExecutorService executorService = mock(ExecutorService.class);
 
     private final FateEngine fateEngine = mock(FateEngine.class);
@@ -64,7 +62,15 @@ public final class DestroyerTest {
 
     private final Infrastructure infrastructure = mock(Infrastructure.class);
 
+    private final Member member1 = new Member("test-id-1", "test-deployment", "test-job", "test-name-1");
+
+    private final Member member2 = new Member("test-id-2", "test-deployment", "test-job", "test-name-2");
+
+    private final Set<Member> members = Stream.of(this.member1, this.member2).collect(Collectors.toSet());
+
     private final Reporter reporter = mock(Reporter.class);
+
+    private final ArgumentCaptor<Runnable> runnableCaptor = ArgumentCaptor.forClass(Runnable.class);
 
     private final StateProvider stateProvider = mock(StateProvider.class);
 
@@ -72,31 +78,10 @@ public final class DestroyerTest {
 
     private final TaskUriBuilder taskUriBuilder = mock(TaskUriBuilder.class);
 
-    private final Destroyer destroyer = new Destroyer(false, this.executorService, this.fateEngine, this.infrastructure,
-            this.reporter, this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
+    private final Destroyer destroyer = new Destroyer(false, this.executorService, this.fateEngine, this.infrastructure, this.reporter, this.stateProvider, "", this.taskRepository,
+        this.taskUriBuilder);
 
     private final MockMvc mockMvc = standaloneSetup(this.destroyer).build();
-
-    private final Member member1 = new Member("test-id-1", "test-deployment", "test-job", "test-name-1");
-
-    private final Member member2 = new Member("test-id-2", "test-deployment", "test-job", "test-name-2");
-
-    private final Set<Member> members = Stream.of(this.member1, this.member2).collect(Collectors.toSet());
-
-    @Before
-    public void members() {
-        when(this.infrastructure.getMembers()).thenReturn(this.members);
-        when(this.fateEngine.shouldDie(this.member1)).thenReturn(true);
-        when(this.fateEngine.shouldDie(this.member2)).thenReturn(false);
-        when(this.taskRepository.create(Trigger.SCHEDULED)).thenReturn(new Task(1L, Trigger.SCHEDULED));
-    }
-
-    @Before
-    @SuppressWarnings("unchecked")
-    public void executor() throws ExecutionException, InterruptedException {
-        when(this.executorService.submit(any(Runnable.class))).thenReturn(this.future);
-        when(this.future.get()).thenReturn(true);
-    }
 
     @Test
     public void destroy() throws DestructionException {
@@ -111,7 +96,7 @@ public final class DestroyerTest {
     @Test
     public void destroyDryRun() throws DestructionException {
         Destroyer destroyer = new Destroyer(true, this.executorService, this.fateEngine, this.infrastructure,
-                this.reporter, this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
+            this.reporter, this.stateProvider, "", this.taskRepository, this.taskUriBuilder);
 
         destroyer.destroy();
         runRunnables();
@@ -121,9 +106,8 @@ public final class DestroyerTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void destroyFail() throws DestructionException {
-        doThrow(new DestructionException()).when(this.infrastructure).destroy(this.member1);
+    public void destroyError() throws DestructionException, IllegalStateException {
+        doThrow(new IllegalStateException()).when(this.infrastructure).destroy(this.member1);
 
         this.destroyer.destroy();
 
@@ -131,8 +115,9 @@ public final class DestroyerTest {
     }
 
     @Test
-    public void destroyError() throws DestructionException, IllegalStateException {
-        doThrow(new IllegalStateException()).when(this.infrastructure).destroy(this.member1);
+    @SuppressWarnings("unchecked")
+    public void destroyFail() throws DestructionException {
+        doThrow(new DestructionException()).when(this.infrastructure).destroy(this.member1);
 
         this.destroyer.destroy();
 
@@ -148,30 +133,19 @@ public final class DestroyerTest {
         verify(this.infrastructure, never()).getMembers();
     }
 
-    @Test
-    public void manualDestroy() throws Exception {
-        Task task = new Task(2L, Trigger.MANUAL);
-        when(this.taskRepository.create(Trigger.MANUAL)).thenReturn(task);
-        when(this.taskUriBuilder.getUri(task)).thenReturn(URI.create("http://foo.com"));
-
-        this.mockMvc.perform(post("/chaos")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"event\":\"destroy\"}"))
-                .andExpect(status().isAccepted())
-                .andExpect(header().string("Location", "http://foo.com"));
-
-        runRunnables();
-
-        verify(this.infrastructure).destroy(this.member1);
-        verify(this.infrastructure, never()).destroy(this.member2);
+    @Before
+    @SuppressWarnings("unchecked")
+    public void executor() throws ExecutionException, InterruptedException {
+        when(this.executorService.submit(any(Runnable.class))).thenReturn(this.future);
+        when(this.future.get()).thenReturn(true);
     }
 
     @Test
     public void invalidKey() throws Exception {
         this.mockMvc.perform(post("/chaos")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"foo\":\"destroy\"}"))
-                .andExpect(status().isBadRequest());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"foo\":\"destroy\"}"))
+            .andExpect(status().isBadRequest());
 
         verify(this.infrastructure, never()).destroy(this.member1);
     }
@@ -179,11 +153,37 @@ public final class DestroyerTest {
     @Test
     public void invalidValue() throws Exception {
         this.mockMvc.perform(post("/chaos")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"event\":\"foo\"}"))
-                .andExpect(status().isBadRequest());
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"event\":\"foo\"}"))
+            .andExpect(status().isBadRequest());
 
         verify(this.infrastructure, never()).destroy(this.member1);
+    }
+
+    @Test
+    public void manualDestroy() throws Exception {
+        Task task = new Task(2L, Trigger.MANUAL);
+        when(this.taskRepository.create(Trigger.MANUAL)).thenReturn(task);
+        when(this.taskUriBuilder.getUri(task)).thenReturn(URI.create("http://foo.com"));
+
+        this.mockMvc.perform(post("/chaos")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"event\":\"destroy\"}"))
+            .andExpect(status().isAccepted())
+            .andExpect(header().string("Location", "http://foo.com"));
+
+        runRunnables();
+
+        verify(this.infrastructure).destroy(this.member1);
+        verify(this.infrastructure, never()).destroy(this.member2);
+    }
+
+    @Before
+    public void members() {
+        when(this.infrastructure.getMembers()).thenReturn(this.members);
+        when(this.fateEngine.shouldDie(this.member1)).thenReturn(true);
+        when(this.fateEngine.shouldDie(this.member2)).thenReturn(false);
+        when(this.taskRepository.create(Trigger.SCHEDULED)).thenReturn(new Task(1L, Trigger.SCHEDULED));
     }
 
     private void runRunnables() {

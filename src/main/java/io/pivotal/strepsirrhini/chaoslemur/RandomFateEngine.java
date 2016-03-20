@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,18 +34,21 @@ final class RandomFateEngine implements FateEngine {
 
     private final String[] blacklist;
 
-    private final String[] whitelist;
-
     private final String defaultProbability;
 
     private final Environment environment;
 
     private final Random random;
 
+    private final String[] whitelist;
+
     @Autowired
     RandomFateEngine(@Value("${blacklist:}") String[] blacklist,
-                     @Value("${default.probability:0.2}") Float defaultProbability, Environment environment,
-                     Random random, @Value("${whitelist:}") String[] whitelist) {
+                     @Value("${default.probability:0.2}") Float defaultProbability,
+                     Environment environment,
+                     Random random,
+                     @Value("${whitelist:}") String[] whitelist) {
+
         this.blacklist = blacklist;
         this.defaultProbability = defaultProbability.toString();
         this.environment = environment;
@@ -64,22 +67,12 @@ final class RandomFateEngine implements FateEngine {
         }
 
         Float probability = new Precedence<String>()
-                .candidate(() -> getProbability(member.getJob()))
-                .candidate(() -> getProbability(member.getDeployment()))
-                .candidate(this.defaultProbability)
-                .get(Float::parseFloat);
+            .candidate(() -> getProbability(member.getJob()))
+            .candidate(() -> getProbability(member.getDeployment()))
+            .candidate(this.defaultProbability)
+            .get(Float::parseFloat);
 
         return this.random.nextFloat() < probability;
-    }
-
-    private boolean isBlacklisted(Member member) {
-        return Arrays.stream(this.blacklist)
-                .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
-    }
-
-    private boolean isWhitelisted(Member member) {
-        return this.whitelist.length == 0 || Arrays.stream(this.whitelist)
-                .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
     }
 
     private String getProbability(String name) {
@@ -88,5 +81,15 @@ final class RandomFateEngine implements FateEngine {
 
     private String getProbabilityKey(String name) {
         return String.format("%s.probability", name);
+    }
+
+    private boolean isBlacklisted(Member member) {
+        return Arrays.stream(this.blacklist)
+            .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
+    }
+
+    private boolean isWhitelisted(Member member) {
+        return this.whitelist.length == 0 || Arrays.stream(this.whitelist)
+            .anyMatch(s -> member.getDeployment().equalsIgnoreCase(s) || member.getJob().equalsIgnoreCase(s));
     }
 }

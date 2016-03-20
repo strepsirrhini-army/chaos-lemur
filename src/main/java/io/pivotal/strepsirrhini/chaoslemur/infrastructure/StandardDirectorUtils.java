@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,8 +56,7 @@ final class StandardDirectorUtils implements DirectorUtils {
                           @Value("${director.username}") String username,
                           @Value("${director.password}") String password,
                           Set<ClientHttpRequestInterceptor> interceptors) throws GeneralSecurityException {
-        this(createRestTemplate(host, username, password, interceptors),
-                UriComponentsBuilder.newInstance().scheme("https").host(host).port(25555).build().toUri());
+        this(createRestTemplate(host, username, password, interceptors), UriComponentsBuilder.newInstance().scheme("https").host(host).port(25555).build().toUri());
     }
 
     StandardDirectorUtils(RestTemplate restTemplate, URI root) {
@@ -65,49 +64,52 @@ final class StandardDirectorUtils implements DirectorUtils {
         this.root = root;
     }
 
-    private static RestTemplate createRestTemplate(String host, String username, String password,
-                                                   Set<ClientHttpRequestInterceptor> interceptors)
-            throws GeneralSecurityException {
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(new AuthScope(host, 25555),
-                new UsernamePasswordCredentials(username, password));
-
-        SSLContext sslContext = SSLContexts.custom()
-                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
-                .useTLS()
-                .build();
-
-        SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(sslContext,
-                new AllowAllHostnameVerifier());
-
-        HttpClient httpClient = HttpClientBuilder.create()
-                .disableRedirectHandling()
-                .setDefaultCredentialsProvider(credentialsProvider)
-                .setSSLSocketFactory(connectionFactory)
-                .build();
-
-        RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(httpClient));
-        restTemplate.getInterceptors().addAll(interceptors);
-
-        return restTemplate;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public Set<String> getDeployments() {
-        URI deploymentsUri = UriComponentsBuilder.fromUri(this.root).path("deployments").build().toUri();
+        URI deploymentsUri = UriComponentsBuilder.fromUri(this.root)
+            .path("deployments")
+            .build().toUri();
+
         List<Map<String, String>> deployments = this.restTemplate.getForObject(deploymentsUri, List.class);
 
-        return deployments.stream().map(deployment -> deployment.get("name")).collect(Collectors.toSet());
+        return deployments.stream()
+            .map(deployment -> deployment.get("name"))
+            .collect(Collectors.toSet());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Set<Map<String, String>> getVirtualMachines(String deployment) {
-        URI vmsUri = UriComponentsBuilder.fromUri(this.root).pathSegment("deployments", deployment, "vms").build()
-                .toUri();
+        URI vmsUri = UriComponentsBuilder.fromUri(this.root)
+            .pathSegment("deployments", deployment, "vms")
+            .build().toUri();
 
         return this.restTemplate.getForObject(vmsUri, Set.class);
+    }
+
+    private static RestTemplate createRestTemplate(String host, String username, String password, Set<ClientHttpRequestInterceptor> interceptors) throws GeneralSecurityException {
+        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(new AuthScope(host, 25555),
+            new UsernamePasswordCredentials(username, password));
+
+        SSLContext sslContext = SSLContexts.custom()
+            .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+            .useTLS()
+            .build();
+
+        SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(sslContext, new AllowAllHostnameVerifier());
+
+        HttpClient httpClient = HttpClientBuilder.create()
+            .disableRedirectHandling()
+            .setDefaultCredentialsProvider(credentialsProvider)
+            .setSSLSocketFactory(connectionFactory)
+            .build();
+
+        RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(httpClient));
+        restTemplate.getInterceptors().addAll(interceptors);
+
+        return restTemplate;
     }
 
 }

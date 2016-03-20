@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,18 @@ public final class AbstractDirectorUtilsInfrastructureTest {
 
     private final Set<String> deployments = new HashSet<>();
 
+    private final DirectorUtils directorUtils = mock(DirectorUtils.class);
+
+    private final StubDirectorUtilsInfrastructure infrastructure = new StubDirectorUtilsInfrastructure(this.directorUtils);
+
+    private final Set<Map<String, String>> vms1 = new HashSet<>();
+
+    private final Set<Map<String, String>> vms2 = new HashSet<>();
+
     {
         this.deployments.add("deployment1");
         this.deployments.add("deployment2-uuid");
     }
-
-    private final Set<Map<String, String>> vms1 = new HashSet<>();
 
     {
         Map<String, String> vm = new HashMap<>();
@@ -48,8 +54,6 @@ public final class AbstractDirectorUtilsInfrastructureTest {
         this.vms1.add(vm);
     }
 
-    private final Set<Map<String, String>> vms2 = new HashSet<>();
-
     {
         Map<String, String> vm = new HashMap<>();
         vm.put("cid", "cid2");
@@ -58,11 +62,6 @@ public final class AbstractDirectorUtilsInfrastructureTest {
 
         this.vms2.add(vm);
     }
-
-    private final DirectorUtils directorUtils = mock(DirectorUtils.class);
-
-    private final StubDirectorUtilsInfrastructure infrastructure = new StubDirectorUtilsInfrastructure(
-            this.directorUtils);
 
     @Test
     public void getMembers() {
@@ -82,7 +81,7 @@ public final class AbstractDirectorUtilsInfrastructureTest {
 
     private static final class StubDirectorUtilsInfrastructure extends AbstractDirectorUtilsInfrastructure {
 
-        protected StubDirectorUtilsInfrastructure(DirectorUtils directorUtils) {
+        StubDirectorUtilsInfrastructure(DirectorUtils directorUtils) {
             super(directorUtils);
         }
 
@@ -90,5 +89,7 @@ public final class AbstractDirectorUtilsInfrastructureTest {
         public void destroy(Member member) throws DestructionException {
 
         }
+
     }
+
 }

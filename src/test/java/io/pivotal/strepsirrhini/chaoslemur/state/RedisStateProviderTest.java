@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,16 +31,11 @@ public final class RedisStateProviderTest {
 
     private static final String KEY = "state";
 
-    private JedisPool jedisPool = mock(JedisPool.class);
-
     private Jedis jedis = mock(Jedis.class);
 
-    private final RedisStateProvider redisStateProvider = new RedisStateProvider(this.jedisPool);
+    private JedisPool jedisPool = mock(JedisPool.class);
 
-    @Before
-    public void jedisPool() {
-        when(this.jedisPool.getResource()).thenReturn(this.jedis);
-    }
+    private final RedisStateProvider redisStateProvider = new RedisStateProvider(this.jedisPool);
 
     @Test
     public void getDefault() {
@@ -53,13 +48,6 @@ public final class RedisStateProviderTest {
         assertEquals(State.STOPPED, this.redisStateProvider.get());
     }
 
-    @Test
-    public void set() {
-        this.redisStateProvider.set(State.STOPPED);
-        verify(this.jedis).set(KEY, State.STOPPED.toString());
-    }
-
-
     @Test(expected = JedisConnectionException.class)
     public void jedisConnectionException() {
         try {
@@ -69,6 +57,17 @@ public final class RedisStateProviderTest {
             verify(this.jedisPool).returnBrokenResource(this.jedis);
             verify(this.jedisPool).returnResource(this.jedis);
         }
+    }
+
+    @Before
+    public void jedisPool() {
+        when(this.jedisPool.getResource()).thenReturn(this.jedis);
+    }
+
+    @Test
+    public void set() {
+        this.redisStateProvider.set(State.STOPPED);
+        verify(this.jedis).set(KEY, State.STOPPED.toString());
     }
 
 }

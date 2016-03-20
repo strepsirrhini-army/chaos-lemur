@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,11 @@ public final class TaskResourceAssemblerTest {
 
     Task task = new Task(0L, Trigger.MANUAL);
 
+    @Test
+    public void getUri() throws URISyntaxException {
+        assertEquals("http://localhost/task/0", this.resourceAssembler.getUri(this.task).toString());
+    }
+
     @Before
     public final void requestContextSetup() {
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -57,8 +62,4 @@ public final class TaskResourceAssemblerTest {
         assertEquals(new Link("http://localhost/task/0", "self"), resource.getLink("self"));
     }
 
-    @Test
-    public void getUri() throws URISyntaxException {
-        assertEquals("http://localhost/task/0", this.resourceAssembler.getUri(this.task).toString());
-    }
 }

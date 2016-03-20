@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ import static org.mockito.Mockito.verify;
 
 public final class AwsInfrastructureTest {
 
-    private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
-
     private final AmazonEC2 amazonEC2 = mock(AmazonEC2.class);
 
     private final DirectorUtils directorUtils = mock(DirectorUtils.class);
 
     private final AwsInfrastructure infrastructure = new AwsInfrastructure(this.directorUtils, this.amazonEC2);
+
+    private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
 
     @Test
     public void destroy() throws Exception {

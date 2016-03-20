@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,20 +34,25 @@ import static org.mockito.Mockito.when;
 
 public final class StandardDirectorUtilsTest {
 
+    private final Map<String, String> deployment = Collections.singletonMap("name", "test-deployment");
+
     private final RestTemplate restTemplate = mock(RestTemplate.class);
 
     private final URI root = URI.create("http://localhost");
 
-    private final Map<String, String> deployment = Collections.singletonMap("name", "test-deployment");
+    private final StandardDirectorUtils directorUtils = new StandardDirectorUtils(this.restTemplate, this.root);
 
     private final Map<String, String> vm = Collections.singletonMap("cid", "test-cid");
 
-    private final StandardDirectorUtils directorUtils = new StandardDirectorUtils(this.restTemplate, this.root);
+    @Test
+    public void constructor() throws GeneralSecurityException {
+        new StandardDirectorUtils("test-host", "test-username", "test-password", new HashSet<>());
+    }
 
     @Test
     public void getDeployments() {
         when(this.restTemplate.getForObject(URI.create("http://localhost/deployments"), List.class))
-                .thenReturn(Arrays.asList(this.deployment));
+            .thenReturn(Arrays.asList(this.deployment));
 
         Set<String> expected = new HashSet<>();
         expected.add("test-deployment");
@@ -61,13 +66,9 @@ public final class StandardDirectorUtilsTest {
         expected.add(this.vm);
 
         when(this.restTemplate.getForObject(URI.create("http://localhost/deployments/test-deployment/vms"), Set.class))
-                .thenReturn(expected);
+            .thenReturn(expected);
 
         assertEquals(expected, this.directorUtils.getVirtualMachines("test-deployment"));
     }
 
-    @Test
-    public void constructor() throws GeneralSecurityException {
-        new StandardDirectorUtils("test-host", "test-username", "test-password", new HashSet<>());
-    }
 }

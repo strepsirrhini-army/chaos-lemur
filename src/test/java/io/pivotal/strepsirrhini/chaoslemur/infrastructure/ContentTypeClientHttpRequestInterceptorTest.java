@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,15 +31,15 @@ import static org.mockito.Mockito.when;
 
 public final class ContentTypeClientHttpRequestInterceptorTest {
 
-    private final MockClientHttpRequest request = new MockClientHttpRequest();
-
     private final byte[] body = new byte[0];
-
-    private final MockClientHttpResponse response = new MockClientHttpResponse(this.body, HttpStatus.OK);
 
     private final ClientHttpRequestExecution execution = mock(ClientHttpRequestExecution.class);
 
     private final ContentTypeClientHttpRequestInterceptor interceptor = new ContentTypeClientHttpRequestInterceptor();
+
+    private final MockClientHttpRequest request = new MockClientHttpRequest();
+
+    private final MockClientHttpResponse response = new MockClientHttpResponse(this.body, HttpStatus.OK);
 
     @Test
     public void intercept() throws IOException {

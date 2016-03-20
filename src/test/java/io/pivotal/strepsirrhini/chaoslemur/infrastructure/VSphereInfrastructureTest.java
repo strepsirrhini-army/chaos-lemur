@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,24 +33,23 @@ import static org.mockito.Mockito.when;
 
 public final class VSphereInfrastructureTest {
 
-    private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
-
-    private final VirtualMachine virtualMachine = mock(VirtualMachine.class);
-
     private final DirectorUtils directorUtils = mock(DirectorUtils.class);
 
     private final InventoryNavigator inventoryNavigator = mock(InventoryNavigator.class);
 
     private final InventoryNavigatorFactory inventoryNavigatorFactory = mock(InventoryNavigatorFactory.class);
 
+    private final VSphereInfrastructure infrastructure = new VSphereInfrastructure(this.directorUtils, this.inventoryNavigatorFactory);
+
+    private final LocalizedMethodFault localizedMethodFault = mock(LocalizedMethodFault.class);
+
+    private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
+
     private final Task task = mock(Task.class);
 
     private final TaskInfo taskInfo = mock(TaskInfo.class);
 
-    private final LocalizedMethodFault localizedMethodFault = mock(LocalizedMethodFault.class);
-
-    private final VSphereInfrastructure infrastructure = new VSphereInfrastructure(this.directorUtils, this
-            .inventoryNavigatorFactory);
+    private final VirtualMachine virtualMachine = mock(VirtualMachine.class);
 
     @Test
     public void destroy() throws DestructionException, IOException {
@@ -76,6 +75,6 @@ public final class VSphereInfrastructureTest {
         when(this.taskInfo.getError()).thenReturn(this.localizedMethodFault);
 
         this.infrastructure.destroy(this.member);
-
     }
+
 }

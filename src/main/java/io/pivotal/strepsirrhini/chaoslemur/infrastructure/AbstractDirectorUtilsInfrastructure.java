@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ abstract class AbstractDirectorUtilsInfrastructure implements Infrastructure {
 
     private final DirectorUtils directorUtils;
 
-    protected AbstractDirectorUtilsInfrastructure(DirectorUtils directorUtils) {
+    AbstractDirectorUtilsInfrastructure(DirectorUtils directorUtils) {
         this.directorUtils = directorUtils;
     }
 
@@ -42,16 +42,22 @@ abstract class AbstractDirectorUtilsInfrastructure implements Infrastructure {
         this.directorUtils.getDeployments().stream().forEach(deployment -> {
             String normalizedDeployment = normalizeDeployment(deployment);
 
-            this.directorUtils.getVirtualMachines(deployment).stream().forEach(virtualMachine -> {
-                String id = virtualMachine.get("cid");
-                String job = normalizeJob(virtualMachine.get("job"));
-                String name = String.format("%s/%s", virtualMachine.get("job"), virtualMachine.get("index"));
+            this.directorUtils.getVirtualMachines(deployment).stream()
+                .forEach(virtualMachine -> {
+                    String id = virtualMachine.get("cid");
+                    String job = normalizeJob(virtualMachine.get("job"));
+                    String name = String.format("%s/%s", virtualMachine.get("job"), virtualMachine.get("index"));
 
-                members.add(new Member(id, normalizedDeployment, job, name));
-            });
+                    members.add(new Member(id, normalizedDeployment, job, name));
+                });
         });
 
         return members;
+    }
+
+    private static String normalize(String value, Pattern pattern) {
+        Matcher matcher = pattern.matcher(value);
+        return matcher.find() ? matcher.group(1) : value;
     }
 
     private String normalizeDeployment(String value) {
@@ -60,15 +66,5 @@ abstract class AbstractDirectorUtilsInfrastructure implements Infrastructure {
 
     private String normalizeJob(String value) {
         return normalize(value, JOB_PATTERN);
-    }
-
-    private static String normalize(String value, Pattern pattern) {
-        Matcher matcher = pattern.matcher(value);
-
-        if (matcher.find()) {
-            return matcher.group(1);
-        } else {
-            return value;
-        }
     }
 }

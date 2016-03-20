@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
 
 final class DataDogReporter implements Reporter {
 
-    private static final String URI = "https://app.datadoghq.com/" +
-            "api/v1/events?api_key={apiKey}&application_key={appKey}";
+    private static final String URI = "https://app.datadoghq.com/api/v1/events?api_key={apiKey}&application_key={appKey}";
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -71,9 +70,9 @@ final class DataDogReporter implements Reporter {
         String s = "\n";
         s += size + English.plural(" VM", size) + " destroyed:\n";
         s += members.stream()
-                .sorted()
-                .map(member -> String.format("  • %s", member.getName()))
-                .collect(Collectors.joining("\n"));
+            .sorted()
+            .map(member -> String.format("  • %s", member.getName()))
+            .collect(Collectors.joining("\n"));
 
         return s;
     }
@@ -81,4 +80,5 @@ final class DataDogReporter implements Reporter {
     private String title(UUID identifier) {
         return String.format("Chaos Lemur Destruction (%s)", identifier);
     }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,15 @@
 
 package io.pivotal.strepsirrhini.chaoslemur;
 
-import io.pivotal.strepsirrhini.chaoslemur.reporter.Reporter;
-import io.pivotal.strepsirrhini.chaoslemur.state.StateProvider;
-import io.pivotal.strepsirrhini.chaoslemur.task.TaskRepository;
-import io.pivotal.strepsirrhini.chaoslemur.task.TaskUriBuilder;
 import io.pivotal.strepsirrhini.chaoslemur.infrastructure.DestructionException;
 import io.pivotal.strepsirrhini.chaoslemur.infrastructure.Infrastructure;
 import io.pivotal.strepsirrhini.chaoslemur.reporter.Event;
+import io.pivotal.strepsirrhini.chaoslemur.reporter.Reporter;
 import io.pivotal.strepsirrhini.chaoslemur.state.State;
+import io.pivotal.strepsirrhini.chaoslemur.state.StateProvider;
 import io.pivotal.strepsirrhini.chaoslemur.task.Task;
+import io.pivotal.strepsirrhini.chaoslemur.task.TaskRepository;
+import io.pivotal.strepsirrhini.chaoslemur.task.TaskUriBuilder;
 import io.pivotal.strepsirrhini.chaoslemur.task.Trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,8 +91,8 @@ final class Destroyer {
     }
 
     /**
-     * Trigger method for destruction of members. This method is invoked on a schedule defined by the cron statement
-     * stored in the {@code schedule} configuration property.  By default this schedule is {@code 0 0 * * * *}.
+     * Trigger method for destruction of members. This method is invoked on a schedule defined by the cron statement stored in the {@code schedule} configuration property.  By default this schedule is
+     * {@code 0 0 * * * *}.
      */
     @Scheduled(cron = "${schedule:0 0 * * * *}")
     public void destroy() {
@@ -132,31 +132,31 @@ final class Destroyer {
         this.logger.info("{} Beginning run...", identifier);
 
         this.infrastructure.getMembers().stream()
-                .map(member -> this.executorService.submit(() -> {
-                    if (this.fateEngine.shouldDie(member)) {
-                        try {
-                            this.logger.debug("{} Destroying: {}", identifier, member);
-
-                            if (this.dryRun) {
-                                this.logger.info("{} Destroyed (Dry Run): {}", identifier, member);
-                            } else {
-                                this.infrastructure.destroy(member);
-                                this.logger.info("{} Destroyed: {}", identifier, member);
-                            }
-
-                            destroyedMembers.add(member);
-                        } catch (DestructionException e) {
-                            this.logger.warn("{} Destroy failed: {}", identifier, member, e);
-                        }
-                    }
-                }))
-                .forEach(future -> {
+            .map(member -> this.executorService.submit(() -> {
+                if (this.fateEngine.shouldDie(member)) {
                     try {
-                        future.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        this.logger.warn("{} Failed to destroy member", identifier, e);
+                        this.logger.debug("{} Destroying: {}", identifier, member);
+
+                        if (this.dryRun) {
+                            this.logger.info("{} Destroyed (Dry Run): {}", identifier, member);
+                        } else {
+                            this.infrastructure.destroy(member);
+                            this.logger.info("{} Destroyed: {}", identifier, member);
+                        }
+
+                        destroyedMembers.add(member);
+                    } catch (DestructionException e) {
+                        this.logger.warn("{} Destroy failed: {}", identifier, member, e);
                     }
-                });
+                }
+            }))
+            .forEach(future -> {
+                try {
+                    future.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    this.logger.warn("{} Failed to destroy member", identifier, e);
+                }
+            });
 
         this.reporter.sendEvent(new Event(identifier, destroyedMembers));
 

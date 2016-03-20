@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,17 +28,17 @@ public final class TaskTest {
     private final Task task = new Task(123L, Trigger.MANUAL);
 
     @Test
+    public void stop() {
+        this.task.stop();
+        assertEquals(this.task.getStatus(), TaskStatus.COMPLETE);
+    }
+
+    @Test
     public void test() {
         assertEquals((Long) 123L, this.task.getId());
         assertEquals(TaskStatus.IN_PROGRESS, this.task.getStatus());
         assertTrue(this.task.getStart().isBefore(LocalDateTime.now().plusSeconds(5)));
         assertEquals(Trigger.MANUAL, this.task.getTrigger());
-    }
-
-    @Test
-    public void stop() {
-        this.task.stop();
-        assertEquals(this.task.getStatus(), TaskStatus.COMPLETE);
     }
 
 }

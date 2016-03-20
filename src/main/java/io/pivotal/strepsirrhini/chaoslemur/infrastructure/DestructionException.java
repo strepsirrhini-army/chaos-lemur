@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,31 +22,27 @@ package io.pivotal.strepsirrhini.chaoslemur.infrastructure;
 public final class DestructionException extends Exception {
 
     /**
-     * Constructs a new exception with {@code null} as its detail message. The cause is not initialized, and may
-     * subsequently be initialized by a call to {@link #initCause}.
+     * Constructs a new exception with {@code null} as its detail message. The cause is not initialized, and may subsequently be initialized by a call to {@link #initCause}.
      */
     public DestructionException() {
         super();
     }
 
     /**
-     * Constructs a new exception with the specified detail message.  The cause is not initialized, and may subsequently
-     * be initialized by a call to {@link #initCause}.
+     * Constructs a new exception with the specified detail message.  The cause is not initialized, and may subsequently be initialized by a call to {@link #initCause}.
      *
-     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
-     *                method.
+     * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()} method.
      */
     public DestructionException(String message) {
         super(message);
     }
 
     /**
-     * Constructs a new exception with the specified detail message and cause.  <p>Note that the detail message
-     * associated with {@code cause} is <i>not</i> automatically incorporated in this exception's detail message.
+     * Constructs a new exception with the specified detail message and cause.  <p>Note that the detail message associated with {@code cause} is <i>not</i> automatically incorporated in this
+     * exception's detail message.
      *
      * @param message the detail message (which is saved for later retrieval by the {@link #getMessage()} method).
-     * @param cause   the cause (which is saved for later retrieval by the {@link #getCause()} method).  (A
-     *                <tt>null</tt> value is permitted, and indicates that the cause is nonexistent or unknown.)
+     * @param cause   the cause (which is saved for later retrieval by the {@link #getCause()} method).  (A <tt>null</tt> value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
     public DestructionException(String message, Throwable cause) {
         super(message, cause);

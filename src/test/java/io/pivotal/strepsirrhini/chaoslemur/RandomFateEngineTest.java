@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,18 +39,7 @@ public final class RandomFateEngineTest {
     private final String[] whitelist = new String[0];
 
     private final RandomFateEngine fateEngine = new RandomFateEngine(this.blacklist, 0.5f, this.environment,
-            this.random, this.whitelist);
-
-    @Test
-    public void neitherWhiteListNorBlacklistSpecified() {
-        when(this.random.nextFloat()).thenReturn(0.0f);
-        RandomFateEngine fateEngine = new RandomFateEngine(new String[0], 0.5f, this.environment, this.random,
-                new String[0]);
-
-        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
-        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
-        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
-    }
+        this.random, this.whitelist);
 
     @Test
     public void blacklistOnly() {
@@ -63,29 +52,36 @@ public final class RandomFateEngineTest {
     }
 
     @Test
-    public void whitelistOnlyDeployments() {
-        when(this.random.nextFloat()).thenReturn(0.0f);
+    public void defaultPrecedence() {
+        when(this.random.nextFloat()).thenReturn(0.4f);
 
-        String[] whitelist = new String[]{"test-deployment"};
-        RandomFateEngine fateEngine = new RandomFateEngine(new String[0], 0.5f, this.environment, this.random,
-                whitelist);
-
-        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
-        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
-        assertFalse(fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
+        assertTrue(this.fateEngine.shouldDie(this.member));
     }
 
     @Test
-    public void whitelistOnlyJobs() {
+    public void deploymentPrecedence() {
+        when(this.random.nextFloat()).thenReturn(0.5f);
+        this.environment.setProperty("test-deployment.probability", "1.0");
+
+        assertTrue(this.fateEngine.shouldDie(this.member));
+    }
+
+    @Test
+    public void jobPrecedence() {
+        when(this.random.nextFloat()).thenReturn(0.5f);
+        this.environment.setProperty("test-job.probability", "1.0");
+
+        assertTrue(this.fateEngine.shouldDie(this.member));
+    }
+
+    @Test
+    public void neitherWhiteListNorBlacklistSpecified() {
         when(this.random.nextFloat()).thenReturn(0.0f);
+        RandomFateEngine fateEngine = new RandomFateEngine(new String[0], 0.5f, this.environment, this.random, new String[0]);
 
-        String[] whitelist = new String[]{"test-job-1"};
-        RandomFateEngine fateEngine = new RandomFateEngine(new String[0], 0.5f, this.environment, this.random,
-                whitelist);
-
-        assertFalse(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
+        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
         assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
-        assertFalse(fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
+        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
     }
 
     @Test
@@ -119,26 +115,27 @@ public final class RandomFateEngineTest {
     }
 
     @Test
-    public void jobPrecedence() {
-        when(this.random.nextFloat()).thenReturn(0.5f);
-        this.environment.setProperty("test-job.probability", "1.0");
+    public void whitelistOnlyDeployments() {
+        when(this.random.nextFloat()).thenReturn(0.0f);
 
-        assertTrue(this.fateEngine.shouldDie(this.member));
+        String[] whitelist = new String[]{"test-deployment"};
+        RandomFateEngine fateEngine = new RandomFateEngine(new String[0], 0.5f, this.environment, this.random, whitelist);
+
+        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
+        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
+        assertFalse(fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
     }
 
     @Test
-    public void deploymentPrecedence() {
-        when(this.random.nextFloat()).thenReturn(0.5f);
-        this.environment.setProperty("test-deployment.probability", "1.0");
+    public void whitelistOnlyJobs() {
+        when(this.random.nextFloat()).thenReturn(0.0f);
 
-        assertTrue(this.fateEngine.shouldDie(this.member));
-    }
+        String[] whitelist = new String[]{"test-job-1"};
+        RandomFateEngine fateEngine = new RandomFateEngine(new String[0], 0.5f, this.environment, this.random, whitelist);
 
-    @Test
-    public void defaultPrecedence() {
-        when(this.random.nextFloat()).thenReturn(0.4f);
-
-        assertTrue(this.fateEngine.shouldDie(this.member));
+        assertFalse(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job", "test-name-1")));
+        assertTrue(fateEngine.shouldDie(new Member("test-id-1", "test-deployment", "test-job-1", "test-name-1")));
+        assertFalse(fateEngine.shouldDie(new Member("test-id-1", "test-deployment-1", "test-job", "test-name-1")));
     }
 
 }

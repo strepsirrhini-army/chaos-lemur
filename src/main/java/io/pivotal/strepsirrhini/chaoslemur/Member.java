@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import org.springframework.util.Assert;
  */
 public final class Member implements Comparable<Member> {
 
-    private final String id;
-
     private final String deployment;
 
-    private final String name;
+    private final String id;
 
     private final String job;
+
+    private final String name;
 
     /**
      * Creates an instance
@@ -51,13 +51,19 @@ public final class Member implements Comparable<Member> {
         this.name = name;
     }
 
-    /**
-     * Returns the ID of the {@link Member}
-     *
-     * @return the ID of the {@link Member}
-     */
-    public String getId() {
-        return this.id;
+    @Override
+    public int compareTo(Member member) {
+        return this.name.compareTo(member.getName());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Member member = (Member) o;
+
+        return name == null ? member.name == null : name.equals(member.name);
     }
 
     /**
@@ -67,6 +73,15 @@ public final class Member implements Comparable<Member> {
      */
     public String getDeployment() {
         return this.deployment;
+    }
+
+    /**
+     * Returns the ID of the {@link Member}
+     *
+     * @return the ID of the {@link Member}
+     */
+    public String getId() {
+        return this.id;
     }
 
     /**
@@ -88,28 +103,13 @@ public final class Member implements Comparable<Member> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Member member = (Member) o;
-
-        return name == null ? member.name == null : name.equals(member.name);
-    }
-
-    @Override
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
     }
 
     @Override
-    public int compareTo(Member member) {
-        return this.name.compareTo(member.getName());
+    public String toString() {
+        return String.format("[id: %s, deployment: %s, job: %s, name: %s]", this.id, this.deployment, this.job, this.name);
     }
 
-    @Override
-    public String toString() {
-        return String.format("[id: %s, deployment: %s, job: %s, name: %s]", this.id, this.deployment, this.job, this
-                .name);
-    }
 }

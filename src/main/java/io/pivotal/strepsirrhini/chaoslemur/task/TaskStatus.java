@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,7 @@
 package io.pivotal.strepsirrhini.chaoslemur.task;
 
 /**
- * Valid states for a {@code Task}
- * <ul>
- *  <li>{@link #COMPLETE}</li>
- *  <li>{@link #IN_PROGRESS}</li>
- *  </ul>
+ * Valid states for a {@code Task} <ul> <li>{@link #COMPLETE}</li> <li>{@link #IN_PROGRESS}</li> </ul>
  */
 public enum TaskStatus {
 
@@ -34,4 +30,5 @@ public enum TaskStatus {
      * The {@code Task} is in progress
      */
     IN_PROGRESS
+
 }

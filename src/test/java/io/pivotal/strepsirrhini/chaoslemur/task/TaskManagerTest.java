@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,23 +50,23 @@ public final class TaskManagerTest {
     @Test
     public void read() throws Exception {
         this.mockMvc.perform(get("/task/0").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.links").value(hasSize(1)))
-                .andExpect(jsonPath("$.links[?(@.rel == 'self')].href").value("http://localhost/task/0"));
-    }
-
-    @Test
-    public void readNull() throws Exception {
-        this.mockMvc.perform(get("/task/99").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.links").value(hasSize(1)))
+            .andExpect(jsonPath("$.links[?(@.rel == 'self')].href").value("http://localhost/task/0"));
     }
 
     @Test
     public void readAll() throws Exception {
         this.mockMvc.perform(get("/task").accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value(hasSize(2)))
-                .andExpect(jsonPath("$[*].links[?(@.rel == 'self')].href")
-                        .value(hasItems("http://localhost/task/0", "http://localhost/task/1")));
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").value(hasSize(2)))
+            .andExpect(jsonPath("$[*].links[?(@.rel == 'self')].href")
+                .value(hasItems("http://localhost/task/0", "http://localhost/task/1")));
+    }
+
+    @Test
+    public void readNull() throws Exception {
+        this.mockMvc.perform(get("/task/99").accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound());
     }
 }

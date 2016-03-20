@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,10 @@ import java.util.Set;
 final class SimpleInfrastructure implements Infrastructure {
 
     @Override
+    public void destroy(Member member) throws DestructionException {
+    }
+
+    @Override
     public Set<Member> getMembers() {
         Set<Member> members = new HashSet<>();
 
@@ -32,10 +36,6 @@ final class SimpleInfrastructure implements Infrastructure {
         members.add(new Member("id-3", "deployment-3", "job-3", "name-3"));
 
         return members;
-    }
-
-    @Override
-    public void destroy(Member member) throws DestructionException {
     }
 
 }

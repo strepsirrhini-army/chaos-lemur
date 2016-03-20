@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015 the original author or authors.
+ * Copyright 2014-2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,14 @@ import static org.junit.Assert.assertEquals;
 
 public final class MemberTest {
 
+    private final Member compare = new Member("compare-id", "compare-deployment", "compare-job", "compare-name");
+
     private final Member member = new Member("test-id", "test-deployment", "test-job", "test-name");
 
-    private final Member compare = new Member("compare-id", "compare-deployment", "compare-job", "compare-name");
+    @Test
+    public void compareTo() {
+        assertTrue(this.member.compareTo(compare) > 0);
+    }
 
     @Test
     public void test() {
@@ -34,13 +39,7 @@ public final class MemberTest {
         assertEquals("test-job", this.member.getJob());
         assertEquals("test-name", this.member.getName());
 
-        assertEquals("[id: test-id, deployment: test-deployment, job: test-job, name: test-name]",
-                this.member.toString());
-    }
-
-    @Test
-    public void compareTo() {
-        assertTrue(this.member.compareTo(compare) > 0);
+        assertEquals("[id: test-id, deployment: test-deployment, job: test-job, name: test-name]", this.member.toString());
     }
 
 }
