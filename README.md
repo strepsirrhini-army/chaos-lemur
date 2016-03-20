@@ -39,25 +39,20 @@ Chaos Lemur requires an infrastructure to be configured, so you must set either 
 
 | Key | Description
 | --- | -----------
-| `AWS_REGION` | The AWS region in which to kill VM's. Default is us-east-1
 | `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
+| `AWS_REGION` | The AWS region in which to kill VM's. Default is us-east-1
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
 | `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
 | `DIRECTOR_PASSWORD` | Used with `DIRECTOR_HOST` to give BOSH Director access.
 | `DIRECTOR_USERNAME` | Used with `DIRECTOR_HOST` to give BOSH Director access.
+| `OPENSTACK_ENDPOINT` | The openstack api endpoint to use to destroy VMs.
+| `OPENSTACK_PASSWORD` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
+| `OPENSTACK_TENANT`   | Used with `OPENSTACK_ENDPOINT` to give the openstack tenant VMs if the  to destroy .
+| `OPENSTACK_USERNAME` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
 | `SIMPLE_INFRASTRUCTURE` | Chaos Lemur will use its built-in infrastructure rather than AWS or vSphere. Useful for testing. The value for the variable is not read, but something is required for Cloud Foundry (e.g. 'true').
 | `VSPHERE_HOST` | The vSphere host used to destroy VMs.
 | `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
 | `VSPHERE_USERNAME` | Used with `VSPHERE_HOST` to give vSphere access.
-| `OPENSTACK_ENDPOINT` | The openstack api endpoint to use to destroy VMs.
-| `OPENSTACK_TENANT`   | Used with `OPENSTACK_ENDPOINT` to give the openstack tenant VMs if the  to destroy .
-| `OPENSTACK_PASSWORD` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
-| `OPENSTACK_USERNAME` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
-
-
-
-
-
 
 ### Reporting
 

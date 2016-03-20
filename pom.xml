@@ -38,9 +38,9 @@
         <aws.version>1.10.62</aws.version>
         <evo-inflector.version>1.2.1</evo-inflector.version>
         <java.version>1.8</java.version>
+        <jclouds.version>1.9.2</jclouds.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <vijava.version>5.1</vijava.version>
-        <jclouds.version>1.9.2</jclouds.version>
     </properties>
 
     <dependencies>
@@ -62,25 +62,21 @@
             <artifactId>vijava</artifactId>
             <version>${vijava.version}</version>
         </dependency>
-        
-		<dependency>
-	      <groupId>org.apache.jclouds.api</groupId>
-	      <artifactId>openstack-keystone</artifactId>
-	      <version>${jclouds.version}</version>
-	    </dependency>
-	    <dependency>
-	      <groupId>org.apache.jclouds.api</groupId>
-	      <artifactId>openstack-nova</artifactId>
-	      <version>${jclouds.version}</version>
-	    </dependency>        
-
-		<dependency>
-			<groupId>org.apache.jclouds.driver</groupId>
-			<artifactId>jclouds-slf4j</artifactId>
-			<version>${jclouds.version}</version>
-		</dependency>
-
-        
+        <dependency>
+          <groupId>org.apache.jclouds.api</groupId>
+          <artifactId>openstack-keystone</artifactId>
+          <version>${jclouds.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.jclouds.api</groupId>
+          <artifactId>openstack-nova</artifactId>
+          <version>${jclouds.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jclouds.driver</groupId>
+            <artifactId>jclouds-slf4j</artifactId>
+            <version>${jclouds.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.atteo</groupId>
             <artifactId>evo-inflector</artifactId>
@@ -124,9 +120,6 @@
                 <configuration>
                     <compilerArgs>
                         <arg>-Werror</arg>
-                        <arg>-Xlint:all</arg>
-                        <arg>-Xlint:-options</arg>
-                        <arg>-Xlint:-processing</arg>
                     </compilerArgs>
                     <showWarnings>true</showWarnings>
                     <source>1.8</source>
