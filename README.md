@@ -81,7 +81,6 @@ This version of chaos-lemur assumes you're running version of bosh that has UAA 
 In order to automate the deployment process as much as possible, the project contains a Cloud Foundry [manifest][y]. 
 Customise the `manifest.yml` file to add environment variables as follows:
 
-    ```
     env:
         DRYRUN: <true or false>  
         AWS_ACCESSKEYID: <your AWS KEYID>
@@ -89,7 +88,7 @@ Customise the `manifest.yml` file to add environment variables as follows:
         DIRECTOR_HOST: <IP of Microbosh>
         DIRECTOR_USERNAME: <user name you've set up during bosh client step>
         DIRECTOR_PASSWORD: <password for the user you've set up during bosh client step>
-     ```
+
 
 
 To deploy run the following commands:
