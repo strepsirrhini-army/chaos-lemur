@@ -76,7 +76,23 @@ Chaos Lemur can use Redis to persist its status across restarts (e,g. if the Paa
 ## Deployment
 _The following instructions assume that you have [created an account][c] and [installed the `cf` command line tool][i]._
 
-In order to automate the deployment process as much as possible, the project contains a Cloud Foundry [manifest][y].  To deploy run the following commands:
+This version of chaos-lemur assumes you're running version of bosh that has UAA integrated. In order to use this with UAA you have to first set up a [Bosh client][k]. 
+
+In order to automate the deployment process as much as possible, the project contains a Cloud Foundry [manifest][y]. 
+Customise the `manifest.yml` file to add environment variables as follows:
+
+    ```
+    env:
+        DRYRUN: <true or false>  
+        AWS_ACCESSKEYID: <your AWS KEYID>
+        AWS_SECRETACCESSKEY: <your AWS Secret Access Key>
+        DIRECTOR_HOST: <IP of Microbosh>
+        DIRECTOR_USERNAME: <user name you've set up during bosh client step>
+        DIRECTOR_PASSWORD: <password for the user you've set up during bosh client step>
+     ```
+
+
+To deploy run the following commands:
 
 ```bash
 mvn clean package
@@ -118,6 +134,7 @@ The project is released under version 2.0 of the [Apache License][a].
 [d]: https://www.datadoghq.com
 [i]: http://docs.run.pivotal.io/devguide/installcf/install-go-cli.html
 [j]: http://www.jetbrains.com/idea/
+[k]: https://docs.pivotal.io/pivotalcf/1-8/customizing/opsmanager-create-bosh-client.html
 [m]: http://maven.apache.org
 [r]: http://docs.run.pivotal.io/marketplace/services/rediscloud.html
 [y]: manifest.yml
