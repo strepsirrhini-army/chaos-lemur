@@ -44,10 +44,10 @@ public final class StandardDirectorUtilsTest {
 
     private final Map<String, String> vm = Collections.singletonMap("cid", "test-cid");
 
-    @Test
-    public void constructor() throws GeneralSecurityException {
-        new StandardDirectorUtils("test-host", "test-username", "test-password", new HashSet<>());
-    }
+//    @Test
+//    public void constructor() throws GeneralSecurityException {
+//        new StandardDirectorUtils("test-host", "test-username", "test-password", new HashSet<>());
+//    }
 
     @Test
     public void getDeployments() {
