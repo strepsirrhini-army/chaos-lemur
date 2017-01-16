@@ -38,15 +38,15 @@ public final class StandardDirectorUtilsTest {
 
     private final RestTemplate restTemplate = mock(RestTemplate.class);
 
-    private final URI root = URI.create("http://localhost");
+    private final URI boshUri = URI.create("http://localhost");
 
-    private final StandardDirectorUtils directorUtils = new StandardDirectorUtils(this.restTemplate, this.root);
+    private final StandardDirectorUtils directorUtils = new StandardDirectorUtils();
 
     private final Map<String, String> vm = Collections.singletonMap("cid", "test-cid");
 
     @Test
     public void constructor() throws GeneralSecurityException {
-        new StandardDirectorUtils("test-host", "test-username", "test-password", new HashSet<>());
+        new StandardDirectorUtils();
     }
 
     @Test

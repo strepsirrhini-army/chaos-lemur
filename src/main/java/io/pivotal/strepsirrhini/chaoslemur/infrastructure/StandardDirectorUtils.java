@@ -27,8 +27,6 @@ import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -44,34 +42,32 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@ConditionalOnProperty("director.host")
 final class StandardDirectorUtils implements DirectorUtils {
 
-    private final RestTemplate restTemplate;
-
-    private final URI root;
+    @Autowired
+    InfrastructureConfiguration config;
 
     @Autowired
-    StandardDirectorUtils(@Value("${director.host}") String host,
-                          @Value("${director.username}") String username,
-                          @Value("${director.password}") String password,
-                          Set<ClientHttpRequestInterceptor> interceptors) throws GeneralSecurityException {
-        this(createRestTemplate(host, username, password, interceptors), UriComponentsBuilder.newInstance().scheme("https").host(host).port(25555).build().toUri());
-    }
+    Set<ClientHttpRequestInterceptor> interceptors;
 
-    StandardDirectorUtils(RestTemplate restTemplate, URI root) {
-        this.restTemplate = restTemplate;
-        this.root = root;
+    private RestTemplate restTemplate() throws GeneralSecurityException {
+        return createRestTemplate(interceptors);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Set<String> getDeployments() {
-        URI deploymentsUri = UriComponentsBuilder.fromUri(this.root)
+        URI deploymentsUri = UriComponentsBuilder.fromUri(config.getBoshUri())
             .path("deployments")
             .build().toUri();
 
-        List<Map<String, String>> deployments = this.restTemplate.getForObject(deploymentsUri, List.class);
+        List<Map<String, String>> deployments = null;
+        try {
+            RestTemplate r = restTemplate();
+            deployments = r.getForObject(deploymentsUri, List.class);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
 
         return deployments.stream()
             .map(deployment -> deployment.get("name"))
@@ -81,17 +77,21 @@ final class StandardDirectorUtils implements DirectorUtils {
     @SuppressWarnings("unchecked")
     @Override
     public Set<Map<String, String>> getVirtualMachines(String deployment) {
-        URI vmsUri = UriComponentsBuilder.fromUri(this.root)
+        URI vmsUri = UriComponentsBuilder.fromUri(config.getBoshUri())
             .pathSegment("deployments", deployment, "vms")
             .build().toUri();
 
-        return this.restTemplate.getForObject(vmsUri, Set.class);
+        Set<Map<String, String>> result = null;
+        try {
+            result = restTemplate().getForObject(vmsUri, Set.class);
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
-    private static RestTemplate createRestTemplate(String host, String username, String password, Set<ClientHttpRequestInterceptor> interceptors) throws GeneralSecurityException {
-        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(new AuthScope(host, 25555),
-            new UsernamePasswordCredentials(username, password));
+    private RestTemplate createRestTemplate(Set<ClientHttpRequestInterceptor> interceptors) throws GeneralSecurityException {
 
         SSLContext sslContext = SSLContexts.custom()
             .loadTrustMaterial(null, new TrustSelfSignedStrategy())
@@ -100,11 +100,19 @@ final class StandardDirectorUtils implements DirectorUtils {
 
         SSLConnectionSocketFactory connectionFactory = new SSLConnectionSocketFactory(sslContext, new AllowAllHostnameVerifier());
 
-        HttpClient httpClient = HttpClientBuilder.create()
+        HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
             .disableRedirectHandling()
-            .setDefaultCredentialsProvider(credentialsProvider)
-            .setSSLSocketFactory(connectionFactory)
-            .build();
+            .setSSLSocketFactory(connectionFactory);
+
+
+        if (config.boshAuthType.equals(BoshAuthType.BASIC_AUTH)) {
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(new AuthScope(config.boshHost, 25555),
+                new UsernamePasswordCredentials(config.boshUser, config.boshPassword));
+            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+        }
+
+        HttpClient httpClient = httpClientBuilder.build();
 
         RestTemplate restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory(httpClient));
         restTemplate.getInterceptors().addAll(interceptors);

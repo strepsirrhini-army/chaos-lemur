@@ -42,9 +42,13 @@ Chaos Lemur requires an infrastructure to be configured, so you must set either 
 | `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
 | `AWS_REGION` | The AWS region in which to kill VM's. Default is us-east-1
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
-| `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
-| `DIRECTOR_PASSWORD` | Used with `DIRECTOR_HOST` to give BOSH Director access.
-| `DIRECTOR_USERNAME` | Used with `DIRECTOR_HOST` to give BOSH Director access.
+| `BOSH_HOST` | The BOSH Director host to query for destruction candidates
+| `BOSH_USER` | BOSH user, used with `BOSH_HOST` to give BOSH Director access.
+| `BOSH_PASSWORD` | BOSH password, used with `BOSH_HOST` to give BOSH Director access.
+| `BOSH_AUTH_TYPE` | the BOSH authentication method, possible values: `BASIC_AUTH` or `UAA`, by default is `BASIC_AUTH`, this method is set [by director.user_management.provider option](https://github.com/cloudfoundry/bosh/blob/7c25c0fc009f86a16a1636ae7eaa7146e316454c/jobs/director/spec#L160-L162).
+| `UAA_HOST` | Used with `BOSH_HOST` to give BOSH Director access (by default has the same value with `BOSH_HOST`).
+| `UAA_CLIENT_ID` | Used with `BOSH_HOST` to give BOSH Director access (by default is `bosh_cli`).
+| `UAA_CLIENT_SECRET` | Used with `BOSH_HOST` to give BOSH Director access (by default is `""`).
 | `OPENSTACK_ENDPOINT` | The openstack api endpoint to use to destroy VMs.
 | `OPENSTACK_PASSWORD` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
 | `OPENSTACK_TENANT`   | Used with `OPENSTACK_ENDPOINT` to give the openstack tenant VMs if the  to destroy .
