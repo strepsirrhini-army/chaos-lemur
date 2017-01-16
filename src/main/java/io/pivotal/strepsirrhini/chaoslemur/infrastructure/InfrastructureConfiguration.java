@@ -40,11 +40,6 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Properties;
 
-class BoshAuthType {
-    public final static String BASIC_AUTH = "BASIC_AUTH";
-    public final static String UAA = "UAA";
-}
-
 @Component
 @Configuration
 class InfrastructureConfiguration {
