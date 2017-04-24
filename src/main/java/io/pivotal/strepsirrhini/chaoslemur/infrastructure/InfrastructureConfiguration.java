@@ -31,16 +31,53 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import javax.annotation.PostConstruct;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Properties;
 
+@Component
 @Configuration
 class InfrastructureConfiguration {
 
+
     @Autowired
     DirectorUtils directorUtils;
+
+    @Value("${bosh.host}")
+    String boshHost;
+
+    @Value("${bosh.user}")
+    String boshUser;
+
+    @Value("${bosh.password}")
+    String boshPassword;
+
+    @Value("${bosh.auth.type:BASIC_AUTH}")
+    String boshAuthType;
+
+    @Value("${uaa.host:}")
+    String uaaHost;
+
+    @Value("${uaa.port:8443}")
+    Integer uaaPort;
+
+    @Value("${uaa.client.id:bosh_cli}")
+    String uaaClientId;
+
+    @Value("${uaa.client.secret:}")
+    String uaaClientSecret;
+
+    @PostConstruct
+    private void init() {
+        if (uaaHost.equals("")) {
+            this.uaaHost = this.boshHost;
+        }
+    }
 
     @Bean
     @ConditionalOnProperty("aws.accessKeyId")
@@ -108,6 +145,18 @@ class InfrastructureConfiguration {
     @ConditionalOnBean(InventoryNavigatorFactory.class)
     VSphereInfrastructure vSphereInfrastructure(DirectorUtils directorUtils, InventoryNavigatorFactory inventoryNavigatorFactory) {
         return new VSphereInfrastructure(directorUtils, inventoryNavigatorFactory);
+    }
+
+    URI getBoshUri() {
+        return buildUri(this.boshHost, 25555);
+    }
+
+    URI getUaaUri() {
+        return buildUri(this.uaaHost, this.uaaPort);
+    }
+
+    URI buildUri(String host, int port) {
+        return UriComponentsBuilder.newInstance().scheme("https").host(host).port(port).build().toUri();
     }
 
 }

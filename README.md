@@ -35,16 +35,21 @@ For example, say you had a BOSH environment with three deployments 'cf', 'redis'
 
 ### Infrastructure
 
-Chaos Lemur requires an infrastructure to be configured, so you must set either the AWS, VSPHERE, or SIMPLE_INFRASTRUCTURE values.
+Chaos Lemur requires an infrastructure to be configured, so you must set either the `AWS`, `VSPHERE`, or `SIMPLE_INFRASTRUCTURE` values to `true`.
 
 | Key | Description
 | --- | -----------
 | `AWS_ACCESSKEYID` | Gives Chaos Lemur access to your AWS infrastructure to destroy VMs.
 | `AWS_REGION` | The AWS region in which to kill VM's. Default is us-east-1
 | `AWS_SECRETACCESSKEY` | Used with the `AWS_ACCESSKEYID` to give AWS access.
-| `DIRECTOR_HOST` | The BOSH Director host to query for destruction candidates
-| `DIRECTOR_PASSWORD` | Used with `DIRECTOR_HOST` to give BOSH Director access.
-| `DIRECTOR_USERNAME` | Used with `DIRECTOR_HOST` to give BOSH Director access.
+| `BOSH_HOST` | The BOSH Director host to query for destruction candidates.
+| `BOSH_USER` | BOSH user, used with `BOSH_HOST` to give BOSH Director access.
+| `BOSH_PASSWORD` | BOSH password, used with `BOSH_HOST` to give BOSH Director access.
+| `BOSH_AUTH_TYPE` | the BOSH authentication method, possible values: `BASIC_AUTH` or `UAA`, by default is `BASIC_AUTH`, this method is set [by director.user_management.provider option](https://github.com/cloudfoundry/bosh/blob/7c25c0fc009f86a16a1636ae7eaa7146e316454c/jobs/director/spec#L160-L162).
+| `UAA_HOST` | Used with `BOSH_AUTH_TYPE` set to `UAA`, UAA host for BOSH authentication (by default has the same value with `BOSH_HOST`).
+| `UAA_PORT` | Used with `BOSH_AUTH_TYPE` set to `UAA`, UAA port for BOSH authentication  (by default is `8443`).
+| `UAA_CLIENT_ID` | Used with `BOSH_AUTH_TYPE` set to `UAA`, UAA Client Id (by default is `bosh_cli`).
+| `UAA_CLIENT_SECRET` | Used with `BOSH_AUTH_TYPE` set to `UAA`, UAA Client Secret (by default is `""`).
 | `OPENSTACK_ENDPOINT` | The openstack api endpoint to use to destroy VMs.
 | `OPENSTACK_PASSWORD` | Used with `OPENSTACK_ENDPOINT` to give vSphere access.
 | `OPENSTACK_TENANT`   | Used with `OPENSTACK_ENDPOINT` to give the openstack tenant VMs if the  to destroy .
@@ -53,6 +58,22 @@ Chaos Lemur requires an infrastructure to be configured, so you must set either 
 | `VSPHERE_HOST` | The vSphere host used to destroy VMs.
 | `VSPHERE_PASSWORD` | Used with `VSPHERE_HOST` to give vSphere access.
 | `VSPHERE_USERNAME` | Used with `VSPHERE_HOST` to give vSphere access.
+
+### Using CA Certificates with BOSH
+
+In order to use CA Certificates with BOSH you'll need to generate Key Store with the following command:
+
+```
+keytool -genkeypair -import -trustcacerts -alias bosh-root -file rootCA.pem -storepass change-me -keystore /path/to/clientsidestore.jks
+```
+
+After that you can use the following system properties while you are running your app.
+
+```
+-Djavax.net.ssl.trustStore=/path/to/clientsidestore.jks -Djavax.net.ssl.trustStorePassword=change-me
+```
+
+If you are running the app in Cloud Foundry, you can place `clientsidestore.jks` key store in your jar as a resource.
 
 ### Reporting
 
