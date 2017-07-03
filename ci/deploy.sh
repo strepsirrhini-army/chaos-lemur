@@ -2,7 +2,5 @@
 
 set -e -u
 
-M2=$PWD/m2
-
 cd chaos-lemur
-./mvnw -q -Dmaven.repo.local=$M2/repository -Dmaven.user.home=$M2 -Dmaven.test.skip=true deploy
+./mvnw -q -Dmaven.repo.local=../m2/repository -Dmaven.user.home=../m2 -Dmaven.test.skip=true deploy
