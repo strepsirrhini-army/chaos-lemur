@@ -10,5 +10,8 @@ image_resource:
 inputs:
 - name: chaos-lemur
 
+caches:
+- path: m2
+
 run:
   path: chaos-lemur/ci/unit-test.sh

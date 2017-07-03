@@ -1,6 +1,8 @@
 #!/usr/bin/env sh
 
-set -e
+set -e -u
+
+M2=$PWD/m2
 
 cd chaos-lemur
-./mvnw -q package
+./mvnw -q -Dmaven.repo.local=$M2/repository -Dmaven.user.home=$M2 package
