@@ -2,5 +2,7 @@
 
 set -e -u
 
+ln -fs $PWD/maven ~/.m2
+
 cd chaos-lemur
-./mvnw -q -Dmaven.repo.local=../m2/repository -Dmaven.user.home=../m2 package
+./mvnw -q package

@@ -11,7 +11,7 @@ inputs:
 - name: chaos-lemur
 
 caches:
-- path: m2
+- path: maven
 
 run:
   path: chaos-lemur/ci/deploy.sh
