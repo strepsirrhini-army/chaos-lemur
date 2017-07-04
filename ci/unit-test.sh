@@ -2,7 +2,7 @@
 
 set -e -u
 
-ln -fs $PWD/maven ~/.m2
+ln -fs $PWD/maven $HOME/.m2
 
 cd chaos-lemur
 ./mvnw -q package
